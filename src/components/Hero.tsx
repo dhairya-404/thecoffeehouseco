@@ -3,7 +3,11 @@ import gsap from 'gsap';
 import { MagneticButton } from './MagneticButton';
 import { useCursor } from '../context/CursorContext';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onReserveClick?: () => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
   const heroRef = useRef<HTMLElement>(null);
   const bgImgRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -138,16 +142,15 @@ export const Hero: React.FC = () => {
               </MagneticButton>
 
               <MagneticButton
-                as="a"
-                href="#ritual"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleScrollTo('ritual');
+                as="button"
+                onClick={() => {
+                  if (onReserveClick) onReserveClick();
+                  else handleScrollTo('location');
                 }}
                 className="btn-magnetic btn-outline-light"
-                cursorText="RITUAL"
+                cursorText="BOOK"
               >
-                THE RITUAL →
+                RESERVE A TABLE →
               </MagneticButton>
             </div>
           </div>

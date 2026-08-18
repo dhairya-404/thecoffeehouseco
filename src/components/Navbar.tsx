@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MagneticButton } from './MagneticButton';
 import { useCursor } from '../context/CursorContext';
+import { useAudioAmbience } from '../hooks/useAudioAmbience';
 
 interface NavbarProps {
   onBookTableClick?: () => void;
@@ -9,7 +10,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const { isPlaying, toggleAudio } = useAudioAmbience();
   const { setCursor, resetCursor } = useCursor();
 
   useEffect(() => {
@@ -97,19 +98,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           <div className="navbar-actions">
             {/* Ambient Sound / Atmosphere Toggle Indicator */}
             <button
-              className="sound-toggle-btn"
-              onClick={() => setIsMuted(!isMuted)}
-              title={isMuted ? 'Ambient Audio (Off)' : 'Ambient Audio (Active)'}
+              className={`sound-toggle-btn ${isPlaying ? 'is-active' : ''}`}
+              onClick={toggleAudio}
+              title={isPlaying ? 'Pause Ambient Café Audio' : 'Play Ambient Café Audio'}
               aria-label="Toggle ambient café sound"
-              onMouseEnter={() => setCursor('open', isMuted ? 'PLAY' : 'MUTE')}
+              onMouseEnter={() => setCursor('open', isPlaying ? 'MUTE' : 'PLAY')}
               onMouseLeave={resetCursor}
             >
-              <div className={`sound-bars ${!isMuted ? 'is-playing' : ''}`}>
+              <div className={`sound-bars ${isPlaying ? 'is-playing' : ''}`}>
                 <span className="bar bar-1"></span>
                 <span className="bar bar-2"></span>
                 <span className="bar bar-3"></span>
               </div>
-              <span className="sound-label">{isMuted ? 'SLOW SOUND: OFF' : 'SLOW SOUND: ON'}</span>
+              <span className="sound-label">{isPlaying ? 'SLOW SOUND: ON' : 'SLOW SOUND: OFF'}</span>
             </button>
 
             {/* Visit / Book CTA */}
@@ -168,6 +169,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           </nav>
 
           <div className="mobile-menu-footer">
+            <button
+              className={`mobile-sound-btn ${isPlaying ? 'is-active' : ''}`}
+              onClick={toggleAudio}
+            >
+              <div className={`sound-bars ${isPlaying ? 'is-playing' : ''}`}>
+                <span className="bar bar-1"></span>
+                <span className="bar bar-2"></span>
+                <span className="bar bar-3"></span>
+              </div>
+              <span>{isPlaying ? 'AMBIENT SOUND: ACTIVE' : 'ENABLE CAFÉ AMBIENCE'}</span>
+            </button>
+
             <div className="mobile-info-block">
               <span className="label-caps">HOURS</span>
               <p>MON–FRI 7AM – 10PM</p>
@@ -491,6 +504,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           color: var(--text-secondary);
           letter-spacing: 0.05em;
           margin-top: 0.25rem;
+        }
+
+        .mobile-sound-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1.25rem;
+          border-radius: 9999px;
+          border: 1px solid var(--border-light);
+          background: rgba(245, 240, 235, 0.04);
+          color: var(--text-secondary);
+          font-size: var(--text-xs);
+          letter-spacing: 0.15em;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          width: 100%;
+        }
+
+        .mobile-sound-btn.is-active {
+          border-color: var(--accent-copper);
+          color: var(--accent-copper);
+          background: rgba(184, 99, 56, 0.08);
         }
 
         .mobile-cta {

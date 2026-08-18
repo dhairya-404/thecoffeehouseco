@@ -5,6 +5,7 @@ import { CursorProvider } from './context/CursorContext';
 import { CustomCursor } from './components/CustomCursor';
 import { Preloader } from './components/Preloader';
 import { NoiseCanvas } from './components/NoiseCanvas';
+import { ReservationModal } from './components/ReservationModal';
 import { useLenis } from './hooks/useLenis';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -22,6 +23,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 function CafeApp() {
   const [loadingComplete, setLoadingComplete] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Initialize Lenis smooth scroll
   useLenis();
 
@@ -41,24 +43,27 @@ function CafeApp() {
       {/* Interactive Contextual Follower Cursor */}
       <CustomCursor />
 
+      {/* Reservation Modal */}
+      <ReservationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
       {/* Preloader Curtain */}
       {!loadingComplete && (
         <Preloader onComplete={handleLoadingComplete} />
       )}
 
       {/* Main Navigation Header */}
-      <Navbar />
+      <Navbar onBookTableClick={() => setIsModalOpen(true)} />
 
       {/* Page Content */}
       <main id="main-content">
-        <Hero />
+        <Hero onReserveClick={() => setIsModalOpen(true)} />
         <IntroStatement />
         <CoffeeSection />
         <MenuSection />
         <RitualSection />
         <StorySection />
         <Atmosphere />
-        <Location />
+        <Location onReserveClick={() => setIsModalOpen(true)} />
       </main>
 
       {/* Editorial Footer */}

@@ -113,7 +113,7 @@ export const IntroStatement: React.FC = () => {
               <div className="intro-photo-badge">SLOW EXTRACTION • 93.5°C</div>
             </div>
           </div>
-          
+
           <div className="intro-content-col">
             <p ref={textRef} className="intro-body-copy">
               In an accelerated world fixated on haste and automated buttons, Ember & Bean was founded to protect the quiet grace of the pause. Every bean we roast is treated as an agricultural marvel, demanding tailored temperatures, calibrated grinds, and unhurried brewing.
@@ -124,7 +124,7 @@ export const IntroStatement: React.FC = () => {
               <p className="quote-text">
                 The cup in your hands is the final punctuation mark of a journey that began on mountain slopes months ago. We only ask that you give it your full attention.
               </p>
-              <div className="quote-author">— Dhairya & Jiya, Founders</div>
+              <div className="quote-author">— Dhairya, Founder</div>
             </div>
           </div>
         </div>

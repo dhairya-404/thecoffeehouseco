@@ -7,7 +7,7 @@ interface LocationProps {
   onReserveClick?: () => void;
 }
 
-export const Location: React.FC<LocationProps> = () => {
+export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [showReserveModal, setShowReserveModal] = useState(false);
   const [bookingName, setBookingName] = useState('');
@@ -91,7 +91,7 @@ export const Location: React.FC<LocationProps> = () => {
               <MagneticButton
                 className="btn-magnetic btn-outline-light"
                 cursorText="RESERVE"
-                onClick={() => setShowReserveModal(true)}
+                onClick={() => (onReserveClick ? onReserveClick() : setShowReserveModal(true))}
               >
                 RESERVE A TABLE
               </MagneticButton>
