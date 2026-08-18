@@ -1,0 +1,342 @@
+@import './variables.css';
+@import './reset.css';
+
+/* Film Grain Texture */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 1;
+}
+
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.container-fluid {
+  width: 100%;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.section {
+  position: relative;
+  padding-top: clamp(4rem, 8vw, 9rem);
+  padding-bottom: clamp(4rem, 8vw, 9rem);
+}
+
+.section-cream {
+  background-color: var(--bg-cream);
+  color: var(--text-dark);
+}
+
+.section-dark {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Typography Hierarchy */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-editorial {
+  font-family: var(--font-editorial);
+  font-style: italic;
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.display-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-display);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.heading-1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+}
+
+.heading-2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 3.5vw, 3rem);
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+.heading-3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  line-height: 1.25;
+}
+
+.label-caps {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--accent-copper);
+}
+
+.body-lead {
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
+.body-lead-dark {
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  line-height: 1.6;
+  font-weight: 300;
+  color: var(--text-dark-secondary);
+}
+
+/* Editorial Line & Divider */
+.editorial-line {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-light);
+  margin: var(--space-lg) 0;
+}
+
+.editorial-line-dark {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-dark);
+  margin: var(--space-lg) 0;
+}
+
+/* Magnetic Button Component Styles */
+.btn-magnetic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: transform 0.3s var(--ease-out-expo), color 0.3s ease, background-color 0.3s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-primary {
+  background-color: var(--accent-copper);
+  color: #FFFFFF;
+  border: 1px solid var(--accent-copper);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-copper-hover);
+  border-color: var(--accent-copper-hover);
+  transform: translateY(-2px);
+}
+
+.btn-outline-light {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+}
+
+.btn-outline-light:hover {
+  background-color: rgba(245, 240, 235, 0.08);
+  border-color: var(--accent-copper);
+  color: #FFFFFF;
+}
+
+.btn-outline-dark {
+  background-color: transparent;
+  color: var(--text-dark);
+  border: 1px solid var(--border-dark);
+}
+
+.btn-outline-dark:hover {
+  background-color: rgba(20, 16, 14, 0.06);
+  border-color: var(--accent-copper);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2C2520;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-copper);
+}
+
+/* Lenis Specific */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Cursor: dot */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  mix-blend-mode: difference;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.custom-cursor.is-visible {
+  opacity: 1;
+}
+
+.custom-cursor.is-hidden {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+}
+
+/* Cursor: expanded ring */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: calc(var(--z-cursor) - 1);
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s var(--ease-cinematic),
+              height 0.3s var(--ease-cinematic),
+              background-color 0.3s ease,
+              border-color 0.3s ease,
+              opacity 0.3s ease;
+  will-change: transform;
+  opacity: 0;
+}
+
+.cursor-ring.is-visible {
+  opacity: 1;
+}
+
+.cursor-ring.is-hidden {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.cursor-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #0F0C0A;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-weight: 700;
+}
+
+.cursor-ring.cursor-active {
+  width: 72px;
+  height: 72px;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.cursor-ring.cursor-active .cursor-text {
+  opacity: 1;
+}
+
+/* Reduced Motion: hide cursors, reduce animations */
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor,
+  .cursor-ring {
+    display: none !important;
+  }
+}
+
+/* Touch devices: hide custom cursor */
+@media (pointer: coarse) {
+  .custom-cursor,
+  .cursor-ring {
+    display: none !important;
+  }
+}
+
+/* Utility: label-caps for dark backgrounds */
+.label-caps-dark {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--text-dark-secondary);
+}
+
+/* App root */
+.app-root {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
