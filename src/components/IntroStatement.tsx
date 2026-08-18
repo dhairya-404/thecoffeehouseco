@@ -98,7 +98,21 @@ export const IntroStatement: React.FC = () => {
 
         {/* Supporting Editorial Paragraphs & Asymmetric Layout */}
         <div className="intro-editorial-grid">
-          <div className="intro-empty-col"></div>
+          <div className="intro-visual-col">
+            <div
+              className="intro-photo-card"
+              onMouseEnter={() => setCursor('view', 'RITUAL')}
+              onMouseLeave={resetCursor}
+            >
+              <img
+                src="/images/ritual_wait.jpg"
+                alt="Carefully brewing manual pour-over specialty coffee"
+                className="intro-photo-img"
+                loading="lazy"
+              />
+              <div className="intro-photo-badge">SLOW EXTRACTION • 93.5°C</div>
+            </div>
+          </div>
           
           <div className="intro-content-col">
             <p ref={textRef} className="intro-body-copy">
@@ -185,8 +199,54 @@ export const IntroStatement: React.FC = () => {
 
         @media (min-width: 900px) {
           .intro-editorial-grid {
-            grid-template-columns: 0.4fr 1fr;
+            grid-template-columns: 0.45fr 1fr;
+            gap: 4.5rem;
+            align-items: center;
           }
+        }
+
+        .intro-visual-col {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .intro-photo-card {
+          position: relative;
+          width: 100%;
+          max-width: 320px;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #14100E;
+          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+          border: 1px solid var(--border-light);
+        }
+
+        .intro-photo-img {
+          width: 100%;
+          height: 380px;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.6s ease;
+        }
+
+        .intro-photo-card:hover .intro-photo-img {
+          transform: scale(1.05);
+        }
+
+        .intro-photo-badge {
+          position: absolute;
+          bottom: 1rem;
+          left: 1rem;
+          background: rgba(15, 12, 10, 0.85);
+          backdrop-filter: blur(8px);
+          padding: 0.35rem 0.75rem;
+          border-radius: 4px;
+          font-size: 0.625rem;
+          letter-spacing: 0.16em;
+          color: var(--accent-copper);
+          border: 1px solid var(--border-light);
+          font-weight: 600;
         }
 
         .intro-body-copy {
