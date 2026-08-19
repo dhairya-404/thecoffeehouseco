@@ -49,9 +49,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   return (
     <div ref={curtainRef} className="preloader-curtain" aria-hidden="true">
       <div ref={contentRef} className="preloader-content">
-        <div className="preloader-brand">EMBER & BEAN</div>
+        <div className="preloader-brand">THE COFFEE HOUSE CO.</div>
         <div className="preloader-counter">{count.toString().padStart(2, '0')}%</div>
-        <div className="preloader-tagline">COFFEE, SLOWLY MADE.</div>
+        <div className="preloader-tagline">COFFEE / FOOD / CULTURE</div>
       </div>
 
       <style>{`

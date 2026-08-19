@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { MagneticButton } from './MagneticButton';
 import { useCursor } from '../context/CursorContext';
 
 interface HeroProps {
@@ -8,450 +7,284 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
-  const heroRef = useRef<HTMLElement>(null);
-  const bgImgRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const subtextRef = useRef<HTMLParagraphElement>(null);
-  const ctaGroupRef = useRef<HTMLDivElement>(null);
-  const scrollPromptRef = useRef<HTMLDivElement>(null);
+  const imageFrameRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const { setCursor, resetCursor } = useCursor();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Image subtle scale in
-      tl.fromTo(
-        bgImgRef.current,
-        { scale: 1.15, filter: 'brightness(0.65) contrast(1.1)' },
-        { scale: 1.0, filter: 'brightness(0.85) contrast(1.05)', duration: 2.2, ease: 'power2.out' },
-        0
-      );
-
-      // Meta badge reveal
       tl.fromTo(
         metaRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.0 },
-        0.3
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 0.2 }
+      )
+      .fromTo(
+        headlineRef.current?.querySelectorAll('.hero-line') || [],
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 1, stagger: 0.12 },
+        '-=0.4'
+      )
+      .fromTo(
+        imageFrameRef.current,
+        { opacity: 0, scale: 0.96 },
+        { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' },
+        '-=0.8'
+      )
+      .fromTo(
+        scrollIndicatorRef.current,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.6 },
+        '-=0.4'
       );
-
-      // Headline lines reveal
-      const headlineLines = headlineRef.current?.querySelectorAll('.hero-line');
-      if (headlineLines) {
-        tl.fromTo(
-          headlineLines,
-          { y: '100%', rotateZ: 2, opacity: 0 },
-          { y: '0%', rotateZ: 0, opacity: 1, duration: 1.3, stagger: 0.18, ease: 'power4.out' },
-          0.5
-        );
-      }
-
-      // Subtext
-      tl.fromTo(
-        subtextRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.0 },
-        0.9
-      );
-
-      // CTAs
-      tl.fromTo(
-        ctaGroupRef.current,
-        { y: 25, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9 },
-        1.1
-      );
-
-      // Scroll Prompt
-      tl.fromTo(
-        scrollPromptRef.current,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 1.0 },
-        1.4
-      );
-    }, heroRef);
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const handleScrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
-    <section ref={heroRef} className="hero-section" id="hero" aria-label="Hero Section">
-      {/* Cinematic Background Layer */}
-      <div className="hero-bg-container">
-        <div
-          ref={bgImgRef}
-          className="hero-bg-image"
-          style={{ backgroundImage: `url('/images/hero_bg.jpg')` }}
-          role="img"
-          aria-label="Atmospheric morning light filtering through Ember & Bean coffee café"
-        />
-        <div className="hero-gradient-overlay"></div>
-        <div className="hero-vignette"></div>
-      </div>
-
-      {/* Hero Content Grid */}
-      <div className="container hero-content-container">
-        {/* Established Badge & Coordinate */}
-        <div ref={metaRef} className="hero-meta-row">
-          <div className="hero-badge">
-            <span className="badge-pulse"></span>
-            <span className="label-caps">EST. 2018 / AHMEDABAD</span>
+    <section ref={sectionRef} className="chc-hero-section" id="hero" aria-label="Hero Section">
+      <div className="container">
+        {/* Section Numbering & Metadata Header */}
+        <div ref={metaRef} className="section-header hero-top-meta">
+          <span className="section-num">01 / THE COFFEE HOUSE CO.</span>
+          <div className="hero-meta-items">
+            <span className="meta-text">AHMEDABAD / 23.0225° N</span>
+            <span className="meta-sep">•</span>
+            <span className="meta-text">07:00 — 22:00</span>
+            <span className="meta-sep">•</span>
+            <span className="meta-text">COFFEE / FOOD / CULTURE</span>
           </div>
-          <span className="hero-coord">23.0225° N, 72.5714° E</span>
         </div>
 
-        {/* Grand Headline */}
-        <div className="hero-headline-wrap">
-          <h1 ref={headlineRef} className="hero-title">
-            <div className="hero-line-mask">
-              <span className="hero-line">COFFEE,</span>
-            </div>
-            <div className="hero-line-mask">
-              <span className="hero-line hero-line-italic">MADE SLOWLY.</span>
-            </div>
-          </h1>
-        </div>
+        {/* Asymmetrical Editorial Composition */}
+        <div className="swiss-grid hero-main-grid">
+          {/* Left Column: Monumental Headline + Statement */}
+          <div className="col-7 col-lg-8 col-sm-12 hero-text-column">
+            <h1 ref={headlineRef} className="display-1 hero-headline">
+              <span className="hero-line d-block">COFFEE</span>
+              <span className="hero-line d-block text-accent-brown">WORTH</span>
+              <span className="hero-line d-block">STAYING</span>
+              <span className="hero-line d-block text-terracotta">FOR.</span>
+            </h1>
 
-        {/* Supporting Editorial Paragraph */}
-        <div className="hero-bottom-grid">
-          <div className="hero-desc-col">
-            <p ref={subtextRef} className="hero-description">
-              Specialty single-origin roasts, unhurried manual pour-overs, honest hearth bakery, and an intimate corner designed for contemplation.
-            </p>
-
-            {/* CTAs */}
-            <div ref={ctaGroupRef} className="hero-cta-group">
-              <MagneticButton
-                as="a"
-                href="#menu"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleScrollTo('menu');
-                }}
-                className="btn-magnetic btn-primary"
-                cursorText="MENU"
-              >
-                EXPLORE THE MENU
-              </MagneticButton>
-
-              <MagneticButton
-                as="button"
-                onClick={() => {
-                  if (onReserveClick) onReserveClick();
-                  else handleScrollTo('location');
-                }}
-                className="btn-magnetic btn-outline-light"
-                cursorText="BOOK"
-              >
-                RESERVE A TABLE →
-              </MagneticButton>
-            </div>
-          </div>
-
-          {/* Quick Origin Micro-Pillars */}
-          <div className="hero-origins-col">
-            <div className="origin-ticker">
-              <div className="origin-item">
-                <span className="origin-num">01</span>
-                <div>
-                  <div className="origin-title">Ratnagiri Estate</div>
-                  <div className="origin-notes">Anaerobic Washed • 1,420m</div>
+            <div className="hero-description-block">
+              <hr className="swiss-rule hero-divider" />
+              <div className="hero-desc-grid">
+                <p className="body-lead hero-intro-copy">
+                  An independent specialty coffee house designed around the discipline of slow extraction, architectural stillness, and honest daily baking along the riverfront.
+                </p>
+                <div className="hero-cta-wrap">
+                  <button
+                    type="button"
+                    className="btn-swiss hero-reserve-action"
+                    onClick={onReserveClick}
+                    onMouseEnter={() => setCursor('link')}
+                    onMouseLeave={resetCursor}
+                  >
+                    <span>RESERVE TASTING TABLE</span>
+                    <span>→</span>
+                  </button>
+                  <a
+                    href="#menu"
+                    className="btn-swiss btn-swiss-outline hero-menu-action"
+                    onMouseEnter={() => setCursor('link')}
+                    onMouseLeave={resetCursor}
+                  >
+                    <span>EXPLORE MENU</span>
+                  </a>
                 </div>
               </div>
-              <div className="origin-item">
-                <span className="origin-num">02</span>
-                <div>
-                  <div className="origin-title">Yirgacheffe Bloom</div>
-                  <div className="origin-notes">Jasmine & Bergamot • 1,950m</div>
-                </div>
+            </div>
+          </div>
+
+          {/* Right Column: Architectural Signature Visual */}
+          <div className="col-5 col-lg-8 col-sm-12 hero-visual-column">
+            <div
+              ref={imageFrameRef}
+              className="hero-image-frame"
+              onMouseEnter={() => setCursor('open', 'VIEW')}
+              onMouseLeave={resetCursor}
+            >
+              <div className="hero-image-wrapper">
+                <img
+                  src="/assets/brand/coffee-cup/chc_signature_cup_front.jpg"
+                  alt="The Coffee House Co. signature unglazed ceramic espresso cup with CHC insignia resting on limestone"
+                  className="hero-primary-photo"
+                  loading="eager"
+                />
+              </div>
+              <div className="hero-image-caption-bar">
+                <span className="meta-text">FIG 01.0 — SIGNATURE STONEWARE CUP</span>
+                <span className="meta-text">DOUBLE SHOT / 1:2 RATIO</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Scroll To Discover Indicator */}
-        <div
-          ref={scrollPromptRef}
-          className="hero-scroll-discover"
-          onClick={() => handleScrollTo('intro')}
-          onMouseEnter={() => setCursor('open', 'DOWN')}
-          onMouseLeave={resetCursor}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="scroll-indicator-line">
-            <span className="scroll-dot"></span>
-          </div>
-          <span className="scroll-text">SCROLL TO DISCOVER</span>
+        {/* Scroll Indicator */}
+        <div ref={scrollIndicatorRef} className="hero-scroll-row">
+          <a href="#intro" className="hero-scroll-link meta-text">
+            <span>SCROLL TO DISCOVER</span>
+            <span className="scroll-down-arrow">↓</span>
+          </a>
         </div>
       </div>
 
       <style>{`
-        .hero-section {
+        .chc-hero-section {
           position: relative;
+          padding-top: clamp(6.5rem, 11vw, 9rem);
+          padding-bottom: clamp(3rem, 6vw, 5rem);
+          background-color: var(--bg-canvas);
           min-height: 100vh;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding-top: calc(var(--header-height) + 2rem);
-          padding-bottom: 4rem;
-          overflow: hidden;
-          background-color: var(--bg-primary);
-        }
-
-        .hero-bg-container {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          z-index: var(--z-background);
-          overflow: hidden;
-        }
-
-        .hero-bg-image {
-          position: absolute;
-          inset: -5%;
-          width: 110%;
-          height: 110%;
-          background-size: cover;
-          background-position: center 35%;
-          will-change: transform, filter;
-        }
-
-        .hero-gradient-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            180deg,
-            rgba(15, 12, 10, 0.45) 0%,
-            rgba(15, 12, 10, 0.25) 40%,
-            rgba(15, 12, 10, 0.85) 85%,
-            rgba(15, 12, 10, 1) 100%
-          );
-        }
-
-        .hero-vignette {
-          position: absolute;
-          inset: 0;
-          box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.7);
-        }
-
-        .hero-content-container {
-          position: relative;
-          z-index: var(--z-base);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          min-height: calc(100vh - var(--header-height) - 6rem);
         }
 
-        .hero-meta-row {
+        .hero-top-meta {
+          margin-bottom: clamp(2rem, 4vw, 3.5rem);
+        }
+
+        .hero-meta-items {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          padding-bottom: 1.5rem;
-        }
-
-        .hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.6rem;
-          padding: 0.4rem 0.9rem;
-          border-radius: 9999px;
-          background: rgba(20, 16, 14, 0.65);
-          backdrop-filter: blur(8px);
-          border: 1px solid var(--border-light);
-        }
-
-        .badge-pulse {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background-color: var(--accent-copper);
-          box-shadow: 0 0 8px var(--accent-copper);
-          animation: pulseGlow 2s infinite ease-in-out;
-        }
-
-        @keyframes pulseGlow {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.75); }
-        }
-
-        .hero-coord {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.2em;
-          color: var(--text-muted);
-          display: none;
-        }
-
-        @media (min-width: 768px) {
-          .hero-coord {
-            display: block;
-          }
-        }
-
-        .hero-headline-wrap {
-          margin: 2rem 0;
-        }
-
-        .hero-title {
-          font-family: var(--font-serif);
-          font-size: clamp(3.2rem, 9.5vw, 8.8rem);
-          line-height: 0.92;
-          font-weight: 400;
-          letter-spacing: -0.025em;
-          color: var(--text-primary);
-          text-transform: uppercase;
-        }
-
-        .hero-line-mask {
-          overflow: hidden;
-          padding-bottom: 0.15em;
-        }
-
-        .hero-line {
-          display: inline-block;
-          will-change: transform, opacity;
-        }
-
-        .hero-line-italic {
-          font-style: italic;
-          font-family: var(--font-editorial);
-          color: #E8DFD8;
-          display: block;
-          letter-spacing: -0.015em;
-        }
-
-        .hero-bottom-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2.5rem;
-          align-items: flex-end;
-          margin-top: 1rem;
-        }
-
-        @media (min-width: 900px) {
-          .hero-bottom-grid {
-            grid-template-columns: 1.4fr 1fr;
-          }
-        }
-
-        .hero-description {
-          font-size: clamp(1.05rem, 1.4vw, 1.25rem);
-          line-height: 1.65;
-          font-weight: 300;
-          color: #DDD5CD;
-          max-width: 540px;
-          margin-bottom: 2rem;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-        }
-
-        .hero-cta-group {
-          display: flex;
+          gap: 0.75rem;
           flex-wrap: wrap;
-          align-items: center;
-          gap: 1.25rem;
         }
 
-        .hero-origins-col {
-          display: none;
+        .meta-sep {
+          color: var(--border-medium);
+          font-size: 0.65rem;
+        }
+
+        @media (max-width: 640px) {
+          .meta-sep, .hero-meta-items span:nth-child(n+3) {
+            display: none;
+          }
+        }
+
+        .hero-main-grid {
+          align-items: start;
+          row-gap: 3rem;
+        }
+
+        .hero-text-column {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .hero-headline {
+          margin-bottom: clamp(2rem, 3.5vw, 3.5rem);
+        }
+
+        .d-block {
+          display: block;
+        }
+
+        .text-accent-brown {
+          color: var(--accent-coffee);
+        }
+
+        .text-terracotta {
+          color: var(--accent-terracotta);
+        }
+
+        .hero-divider {
+          margin-bottom: 2rem;
+        }
+
+        .hero-desc-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem;
+          max-width: 620px;
+        }
+
+        .hero-intro-copy {
+          color: var(--text-secondary);
+        }
+
+        .hero-cta-wrap {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .hero-visual-column {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .hero-image-frame {
+          position: relative;
+          background-color: var(--bg-canvas-subtle);
+          border: 1px solid var(--border-hairline);
+          padding: 1rem;
+        }
+
+        .hero-image-wrapper {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          overflow: hidden;
+          background-color: #E6E2D8;
+        }
+
+        .hero-primary-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.8s var(--ease-editorial);
+        }
+
+        .hero-image-frame:hover .hero-primary-photo {
+          transform: scale(1.03);
+        }
+
+        .hero-image-caption-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 0.875rem;
+          border-top: 1px solid var(--border-hairline);
+          margin-top: 0.875rem;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .hero-scroll-row {
+          padding-top: clamp(2.5rem, 5vw, 4.5rem);
+          display: flex;
           justify-content: flex-end;
         }
 
-        @media (min-width: 900px) {
-          .hero-origins-col {
-            display: flex;
-          }
+        .hero-scroll-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--text-muted);
+          transition: color 0.2s ease;
         }
 
-        .origin-ticker {
-          background: rgba(20, 16, 14, 0.6);
-          backdrop-filter: blur(12px);
-          border: 1px solid var(--border-light);
-          padding: 1.25rem 1.75rem;
-          border-radius: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          min-width: 290px;
-        }
-
-        .origin-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-        }
-
-        .origin-num {
-          font-size: var(--text-2xs);
-          color: var(--accent-copper);
-          font-weight: 600;
-          letter-spacing: 0.15em;
-          padding-top: 2px;
-        }
-
-        .origin-title {
-          font-family: var(--font-serif);
-          font-size: 1.05rem;
+        .hero-scroll-link:hover {
           color: var(--text-primary);
         }
 
-        .origin-notes {
-          font-size: var(--text-xs);
-          color: var(--text-muted);
-          letter-spacing: 0.05em;
+        .scroll-down-arrow {
+          animation: floatArrow 2s infinite ease-in-out;
         }
 
-        .hero-scroll-discover {
-          margin-top: 3rem;
-          display: flex;
-          align-items: center;
-          gap: 1.25rem;
-          cursor: pointer;
-          width: fit-content;
-        }
-
-        .scroll-indicator-line {
-          position: relative;
-          width: 1px;
-          height: 36px;
-          background-color: var(--border-medium);
-          overflow: hidden;
-        }
-
-        .scroll-dot {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 12px;
-          background-color: var(--accent-copper);
-          animation: scrollDown 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-        }
-
-        @keyframes scrollDown {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(300%); }
-        }
-
-        .scroll-text {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.24em;
-          font-weight: 500;
-          color: var(--text-secondary);
-          transition: color 0.3s ease;
-        }
-
-        .hero-scroll-discover:hover .scroll-text {
-          color: var(--accent-copper);
+        @keyframes floatArrow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(5px); }
         }
       `}</style>
     </section>

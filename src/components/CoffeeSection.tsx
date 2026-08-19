@@ -1,381 +1,262 @@
-import React, { useState, useRef, useEffect } from 'react';
-import gsap from 'gsap';
+import React, { useState } from 'react';
 import { COFFEE_FEATURES } from '../data/cafeData';
 import { useCursor } from '../context/CursorContext';
-import { MagneticButton } from './MagneticButton';
 
 export const CoffeeSection: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [selectedFeature, setSelectedFeature] = useState(0);
   const { setCursor, resetCursor } = useCursor();
-  const currentCoffee = COFFEE_FEATURES[activeIndex];
-  const imageRef = useRef<HTMLImageElement>(null);
-  const detailsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (imageRef.current) {
-      gsap.fromTo(
-        imageRef.current,
-        { scale: 1.08, opacity: 0.7, filter: 'blur(4px)' },
-        { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }
-      );
-    }
-
-    if (detailsRef.current) {
-      gsap.fromTo(
-        detailsRef.current.children,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out' }
-      );
-    }
-  }, [activeIndex]);
+  const currentCoffee = COFFEE_FEATURES[selectedFeature];
 
   return (
-    <section id="coffee" className="coffee-section" aria-label="Coffee Philosophy and Selections">
+    <section className="chc-craft-section dark-chapter" id="craft" aria-label="The Craft of Extraction">
       <div className="container">
         {/* Section Header */}
-        <div className="coffee-header-grid">
-          <div>
-            <span className="label-caps">OUR COFFEE LINEAGE</span>
-            <h2 className="heading-1 coffee-main-heading">
-              CRAFT OVER <span className="font-editorial italic text-copper">SPEED.</span>
-            </h2>
-          </div>
-          <p className="body-lead coffee-lead-text">
-            We partner directly with smallholder coffee estates across Chikmagalur, Yirgacheffe, and Biligirirangana hills. Every harvest is roasted to honor its micro-climate and cellular density.
-          </p>
+        <div className="section-header">
+          <span className="section-num">03 / THE CRAFT</span>
+          <span className="section-caption">SINGLE ESTATE MICRO-LOTS & EXTRACTION</span>
         </div>
 
-        {/* Category Nav Tabs */}
-        <div className="coffee-tab-nav" role="tablist">
-          {COFFEE_FEATURES.map((item, index) => (
+        {/* Grand Craft Statement */}
+        <div className="swiss-grid craft-headline-grid">
+          <div className="col-10 col-lg-8 col-sm-12">
+            <h2 className="heading-hero craft-hero-title">
+              GOOD COFFEE IS A MATTER OF ATTENTION.
+            </h2>
+          </div>
+        </div>
+
+        {/* Feature Navigation Tabs in Swiss Style */}
+        <div className="craft-selector-bar">
+          {COFFEE_FEATURES.map((item, idx) => (
             <button
               key={item.id}
-              role="tab"
-              aria-selected={activeIndex === index}
-              className={`coffee-tab-btn ${activeIndex === index ? 'is-active' : ''}`}
-              onClick={() => setActiveIndex(index)}
+              type="button"
+              className={`craft-tab-btn ${selectedFeature === idx ? 'is-active' : ''}`}
+              onClick={() => setSelectedFeature(idx)}
               onMouseEnter={() => setCursor('link')}
               onMouseLeave={resetCursor}
             >
-              <span className="coffee-tab-num">{item.number}</span>
-              <span className="coffee-tab-name">{item.name}</span>
+              <span className="tab-num meta-text">{item.number}</span>
+              <span className="tab-name font-display">{item.name}</span>
             </button>
           ))}
         </div>
 
-        {/* Editorial Feature Showcase */}
-        <div className="coffee-showcase-grid">
-          {/* Left Column: Visual with Hover Micro-Interaction */}
-          <div
-            className="coffee-image-frame"
-            onMouseEnter={() => setCursor('view', 'EXPLORE')}
-            onMouseLeave={resetCursor}
-          >
-            <div className="image-aspect-wrapper">
+        {/* Interactive Feature Display Grid */}
+        <div className="swiss-grid craft-detail-grid">
+          {/* Visual Column */}
+          <div className="col-6 col-lg-8 col-sm-12">
+            <div className="craft-image-frame">
               <img
-                ref={imageRef}
-                key={currentCoffee.image}
                 src={currentCoffee.image}
                 alt={currentCoffee.name}
-                className="coffee-featured-img"
-                loading="lazy"
+                className="craft-photo"
+                key={currentCoffee.id}
               />
-            </div>
-            <div className="image-caption-overlay">
-              <span className="caption-tag">{currentCoffee.origin}</span>
-              <span className="caption-tag">{currentCoffee.elevation}</span>
+              <div className="craft-image-tag">
+                <span className="meta-text">{currentCoffee.number} // {currentCoffee.name}</span>
+                <span className="meta-text">{currentCoffee.elevation}</span>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Deep Editorial Metadata & Tasting Profile */}
-          <div ref={detailsRef} className="coffee-details-col">
-            <div className="coffee-num-huge">{currentCoffee.number}</div>
-
-            <div className="coffee-title-group">
-              <h3 className="coffee-name-display">{currentCoffee.name}</h3>
-              <p className="coffee-tagline-text">{currentCoffee.tagline}</p>
+          {/* Editorial Specs Column */}
+          <div className="col-6 col-lg-8 col-sm-12 craft-spec-col">
+            <div className="craft-text-top">
+              <span className="meta-text highlight-spec">ORIGIN SPECIFICATION</span>
+              <h3 className="heading-section craft-item-name">{currentCoffee.name}</h3>
+              <p className="body-lead craft-tagline">{currentCoffee.tagline}</p>
+              <p className="body-text craft-body-p">{currentCoffee.description}</p>
             </div>
 
-            {/* Tasting Notes Cloud */}
-            <div className="tasting-notes-block">
-              <span className="notes-label">TASTING NOTES</span>
-              <div className="notes-tags-wrap">
-                {currentCoffee.tastingNotes.map((note) => (
-                  <span key={note} className="note-pill">
-                    {note}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Spec Sheet Table */}
-            <div className="coffee-spec-sheet">
+            {/* Swiss Metadata Table */}
+            <div className="craft-specs-table">
               <div className="spec-row">
-                <span className="spec-key">ESTATE & ORIGIN</span>
-                <span className="spec-val">{currentCoffee.origin}</span>
+                <span className="meta-text spec-label">ESTATE / REGION</span>
+                <span className="spec-value font-sans">{currentCoffee.origin}</span>
               </div>
               <div className="spec-row">
-                <span className="spec-key">PROCESSING METHOD</span>
-                <span className="spec-val">{currentCoffee.process}</span>
+                <span className="meta-text spec-label">PROCESSING</span>
+                <span className="spec-value font-sans">{currentCoffee.process}</span>
               </div>
               <div className="spec-row">
-                <span className="spec-key">GROWTH ELEVATION</span>
-                <span className="spec-val">{currentCoffee.elevation}</span>
+                <span className="meta-text spec-label">ELEVATION</span>
+                <span className="spec-value font-sans">{currentCoffee.elevation}</span>
               </div>
-            </div>
-
-            {/* Narrative Description */}
-            <p className="coffee-narrative-p">{currentCoffee.description}</p>
-
-            {/* CTA */}
-            <div className="coffee-cta-wrap">
-              <MagneticButton
-                as="a"
-                href="#menu"
-                className="btn-magnetic btn-outline-light"
-                cursorText="VIEW"
-              >
-                VIEW ON MENU →
-              </MagneticButton>
+              <div className="spec-row tasting-row">
+                <span className="meta-text spec-label">TASTING NOTES</span>
+                <div className="tasting-tags-wrap">
+                  {currentCoffee.tastingNotes.map((note) => (
+                    <span key={note} className="tasting-pill font-mono">{note}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
-        .coffee-section {
+        .chc-craft-section {
+          background-color: var(--bg-canvas-dark);
+          color: var(--text-inverse);
           position: relative;
-          background-color: var(--bg-primary);
-          padding-top: clamp(6rem, 10vw, 10rem);
-          padding-bottom: clamp(6rem, 10vw, 10rem);
         }
 
-        .coffee-header-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          margin-bottom: 4rem;
+        .craft-headline-grid {
+          margin-bottom: clamp(3rem, 5vw, 5rem);
         }
 
-        @media (min-width: 900px) {
-          .coffee-header-grid {
-            grid-template-columns: 1.2fr 1fr;
-            align-items: flex-end;
-          }
+        .craft-hero-title {
+          color: var(--text-inverse);
+          letter-spacing: -0.035em;
         }
 
-        .coffee-main-heading {
-          margin-top: 0.75rem;
-          color: var(--text-primary);
-        }
-
-        .text-copper {
-          color: var(--accent-copper);
-        }
-
-        .coffee-lead-text {
-          max-width: 500px;
-        }
-
-        .coffee-tab-nav {
+        .craft-selector-bar {
           display: flex;
+          border-top: 1px solid var(--border-inverse-hairline);
+          border-bottom: 1px solid var(--border-inverse-hairline);
+          margin-bottom: clamp(2.5rem, 4.5vw, 4.5rem);
           overflow-x: auto;
-          border-bottom: 1px solid var(--border-light);
-          margin-bottom: 4rem;
-          padding-bottom: 0.5rem;
-          gap: 1.5rem;
           scrollbar-width: none;
         }
 
-        .coffee-tab-nav::-webkit-scrollbar {
+        .craft-selector-bar::-webkit-scrollbar {
           display: none;
         }
 
-        .coffee-tab-btn {
+        .craft-tab-btn {
+          flex: 1;
+          min-width: 180px;
           display: flex;
-          align-items: center;
+          align-items: baseline;
           gap: 0.75rem;
-          padding: 0.75rem 1.25rem;
-          white-space: nowrap;
-          border-radius: 9999px;
-          border: 1px solid transparent;
-          color: var(--text-muted);
-          transition: all 0.3s ease;
+          padding: 1.25rem 1.5rem;
+          border-right: 1px solid var(--border-inverse-hairline);
+          color: var(--text-inverse-muted);
+          transition: all var(--duration-fast) ease;
+          text-align: left;
         }
 
-        .coffee-tab-btn.is-active {
-          color: var(--text-primary);
-          background-color: var(--bg-card);
-          border-color: var(--border-copper);
+        .craft-tab-btn:last-child {
+          border-right: none;
         }
 
-        .coffee-tab-num {
-          font-size: var(--text-xs);
-          letter-spacing: 0.1em;
-          color: var(--accent-copper);
+        .craft-tab-btn.is-active {
+          background-color: rgba(245, 243, 238, 0.06);
+          color: var(--text-inverse);
+        }
+
+        .craft-tab-btn.is-active .tab-num {
+          color: var(--accent-terracotta);
+        }
+
+        .tab-num {
+          color: var(--text-inverse-muted);
+        }
+
+        .tab-name {
+          font-size: 1rem;
           font-weight: 600;
+          letter-spacing: 0.05em;
         }
 
-        .coffee-tab-name {
-          font-size: var(--text-xs);
-          letter-spacing: 0.18em;
-          font-weight: 500;
-        }
-
-        .coffee-showcase-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 3.5rem;
+        .craft-detail-grid {
           align-items: center;
+          row-gap: 3rem;
         }
 
-        @media (min-width: 960px) {
-          .coffee-showcase-grid {
-            grid-template-columns: 1.1fr 1fr;
-            gap: 5rem;
-          }
-        }
-
-        .coffee-image-frame {
+        .craft-image-frame {
           position: relative;
-          border-radius: 4px;
-          overflow: hidden;
-          background: #14100E;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-          cursor: pointer;
+          background-color: var(--bg-canvas-dark-elevated);
+          border: 1px solid var(--border-inverse-hairline);
+          padding: 0.85rem;
         }
 
-        .image-aspect-wrapper {
-          position: relative;
-          padding-bottom: 120%;
-          overflow: hidden;
-        }
-
-        .coffee-featured-img {
-          position: absolute;
-          inset: 0;
+        .craft-photo {
           width: 100%;
-          height: 100%;
+          aspect-ratio: 4 / 3;
           object-fit: cover;
-          transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .coffee-image-frame:hover .coffee-featured-img {
-          transform: scale(1.05);
-        }
-
-        .image-caption-overlay {
-          position: absolute;
-          bottom: 1.5rem;
-          left: 1.5rem;
+        .craft-image-tag {
           display: flex;
-          gap: 0.6rem;
-          z-index: 2;
+          justify-content: space-between;
+          padding-top: 0.75rem;
+          border-top: 1px solid var(--border-inverse-hairline);
+          margin-top: 0.75rem;
+          color: var(--text-inverse-muted);
         }
 
-        .caption-tag {
-          font-size: 0.6875rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          background: rgba(15, 12, 10, 0.75);
-          backdrop-filter: blur(8px);
-          padding: 0.4rem 0.8rem;
-          border-radius: 4px;
-          color: var(--text-primary);
-          border: 1px solid var(--border-light);
-        }
-
-        .coffee-details-col {
+        .craft-spec-col {
           display: flex;
           flex-direction: column;
-          gap: 1.75rem;
+          gap: 2rem;
         }
 
-        .coffee-num-huge {
-          font-family: var(--font-serif);
-          font-size: clamp(3.5rem, 6vw, 5.5rem);
-          line-height: 0.9;
-          color: rgba(200, 122, 83, 0.25);
-        }
-
-        .coffee-name-display {
-          font-family: var(--font-serif);
-          font-size: clamp(2rem, 3.5vw, 3rem);
-          line-height: 1.1;
-          color: var(--text-primary);
-          letter-spacing: -0.01em;
-        }
-
-        .coffee-tagline-text {
-          font-family: var(--font-editorial);
-          font-style: italic;
-          font-size: 1.2rem;
-          color: #DDD4CB;
-          margin-top: 0.4rem;
-        }
-
-        .tasting-notes-block {
-          margin-top: 0.5rem;
-        }
-
-        .notes-label {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.2em;
-          color: var(--accent-copper);
+        .highlight-spec {
+          color: var(--accent-terracotta);
+          margin-bottom: 0.5rem;
           display: block;
+        }
+
+        .craft-item-name {
+          color: var(--text-inverse);
           margin-bottom: 0.75rem;
         }
 
-        .notes-tags-wrap {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.6rem;
+        .craft-tagline {
+          color: var(--text-inverse-muted);
+          margin-bottom: 1rem;
         }
 
-        .note-pill {
-          font-size: var(--text-xs);
-          letter-spacing: 0.08em;
-          padding: 0.4rem 0.9rem;
-          background: rgba(245, 240, 235, 0.05);
-          border: 1px solid var(--border-light);
-          border-radius: 9999px;
-          color: var(--text-secondary);
+        .craft-body-p {
+          color: var(--text-inverse-muted);
+          line-height: 1.7;
         }
 
-        .coffee-spec-sheet {
-          border-top: 1px solid var(--border-light);
-          border-bottom: 1px solid var(--border-light);
-          padding: 1.25rem 0;
+        .craft-specs-table {
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
+          border-top: 1px solid var(--border-inverse-hairline);
         }
 
         .spec-row {
           display: flex;
           justify-content: space-between;
-          font-size: var(--text-xs);
+          align-items: baseline;
+          padding: 0.875rem 0;
+          border-bottom: 1px solid var(--border-inverse-hairline);
+          flex-wrap: wrap;
+          gap: 0.5rem;
         }
 
-        .spec-key {
-          letter-spacing: 0.15em;
-          color: var(--text-muted);
+        .spec-label {
+          color: var(--text-inverse-muted);
         }
 
-        .spec-val {
-          color: var(--text-primary);
+        .spec-value {
+          color: var(--text-inverse);
           font-weight: 500;
         }
 
-        .coffee-narrative-p {
-          font-size: 1rem;
-          line-height: 1.7;
-          color: #C2BAB1;
-          font-weight: 300;
+        .tasting-row {
+          align-items: center;
         }
 
-        .coffee-cta-wrap {
-          margin-top: 0.5rem;
+        .tasting-tags-wrap {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .tasting-pill {
+          font-size: 0.6875rem;
+          padding: 0.25rem 0.65rem;
+          border: 1px solid var(--border-inverse-hairline);
+          color: var(--text-inverse);
+          background-color: rgba(255, 255, 255, 0.04);
         }
       `}</style>
     </section>

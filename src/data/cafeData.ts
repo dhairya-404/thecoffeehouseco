@@ -1,15 +1,17 @@
 import type { CoffeeFeature, MenuCategory, RitualStep, GalleryItem } from '../types';
 
 export const BRAND_INFO = {
-  name: 'EMBER & BEAN',
-  tagline: 'Coffee, slowly made.',
-  established: 'EST. 2018 / AHMEDABAD',
+  name: 'THE COFFEE HOUSE CO.',
+  shortName: 'CHC',
+  tagline: 'COFFEE / FOOD / CULTURE',
+  subTagline: 'A specialty coffee house with a strong editorial identity.',
+  established: 'EST. 2019 / AHMEDABAD',
   location: '21 Riverfront Road, Ahmedabad, Gujarat 380001',
   phone: '+91 79 4892 0188',
-  email: 'gather@emberandbean.in',
+  email: 'gather@thecoffeehouse.co',
   hours: {
-    weekdays: 'MON – FRI  7:00 AM – 10:00 PM',
-    weekends: 'SAT – SUN  8:00 AM – 11:00 PM',
+    weekdays: 'MON – FRI  07:00 — 22:00',
+    weekends: 'SAT – SUN  08:00 — 23:00',
   },
   coordinates: '23.0225° N, 72.5714° E',
 };
@@ -98,7 +100,7 @@ export const MENU_CATEGORIES: MenuCategory[] = [
       { name: '18h Kyoto Drip Cold Brew', price: '₹240', description: 'Dark chocolate notes, served over a hand-carved clear ice sphere.', image: '/images/menu/coldbrew.jpg' },
       { name: 'Cascara & Citrus Tonic', price: '₹230', description: 'Dried coffee cherry tea with elderflower tonic and dehydrated orange wheel.', image: '/images/menu/cascara.jpg' },
       { name: 'Sparkling Espresso Tonic', price: '₹250', description: 'Double shot floated over artisanal Indian tonic water with rosemary sprig.', image: '/images/menu/espressotonic.jpg' },
-      { name: 'Ember Iced Oat Cortado', price: '₹260', description: 'Malted oat milk shaken with concentrated espresso and vanilla bean syrup.', image: '/images/menu/oatcortado.jpg' },
+      { name: 'House Iced Oat Cortado', price: '₹260', description: 'Malted oat milk shaken with concentrated double espresso and pure vanilla bean infusion.', image: '/images/menu/oatcortado.jpg' },
     ],
   },
   {
@@ -118,7 +120,7 @@ export const MENU_CATEGORIES: MenuCategory[] = [
     description: 'Laminated pastries and desserts crafted daily before dawn.',
     items: [
       { name: 'Cardamom Brown Butter Croissant', price: '₹180', description: '48-hour fermented laminated dough with roasted green cardamom glaze.', image: '/images/menu/croissant.jpg' },
-      { name: 'Ember Espresso Tiramisu', price: '₹260', description: 'House savoiardi steeped in hot espresso and dark rum with light mascarpone.', image: '/images/menu/tiramisu.jpg' },
+      { name: 'House Espresso Tiramisu', price: '₹260', description: 'House savoiardi steeped in hot espresso and dark rum with light mascarpone.', image: '/images/menu/tiramisu.jpg' },
       { name: 'Valrhona Sea Salt Financier', price: '₹190', description: 'Dense almond cake with dark chocolate core and Malden salt crystals.', image: '/images/menu/financier.jpg' },
       { name: 'Canelé de Bordeaux', price: '₹160', description: 'Caramelized crunchy beeswax crust with custardy vanilla rum interior.', image: '/images/menu/canele.jpg' },
     ],

@@ -8,239 +8,215 @@ export const Atmosphere: React.FC = () => {
   const { setCursor, resetCursor } = useCursor();
 
   return (
-    <section id="atmosphere" className="atmosphere-section" aria-label="Atmosphere and Visual Journal">
+    <section className="chc-atmosphere-section" id="atmosphere" aria-label="Visual Archive of The Space">
       <div className="container">
         {/* Section Header */}
-        <div className="atmosphere-header">
-          <div>
-            <span className="label-caps">VISUAL CHRONICLE</span>
-            <h2 className="heading-1 atmosphere-heading">
-              ATMOSPHERE <span className="font-editorial italic">& LIGHT.</span>
+        <div className="section-header">
+          <span className="section-num">06 / THE VISUAL ARCHIVE</span>
+          <span className="section-caption">ATMOSPHERE • LIGHT • TACTILE DETAILS</span>
+        </div>
+
+        {/* Headline */}
+        <div className="swiss-grid atmosphere-title-grid">
+          <div className="col-10 col-lg-8 col-sm-12">
+            <h2 className="heading-section atmosphere-main-title">
+              MOMENTS OBSERVED ACROSS THE DAY.
             </h2>
-          </div>
-          <div className="atmosphere-meta-text">
-            <p className="body-lead">
-              A photographic journal documenting sunlight across linen tables, the morning steam, and the slow rhythm of the riverfront.
-            </p>
           </div>
         </div>
 
-        {/* Masonry Editorial Grid */}
-        <div className="atmosphere-grid">
-          {ATMOSPHERE_GALLERY.map((item) => (
+        {/* Curated Editorial Masonry Grid */}
+        <div className="atmosphere-masonry-grid">
+          {ATMOSPHERE_GALLERY.map((item, idx) => (
             <div
               key={item.id}
-              className={`gallery-card aspect-${item.aspect}`}
+              className={`atmosphere-card card-${item.aspect || 'portrait'}`}
               onClick={() => setActiveModalItem(item)}
-              onMouseEnter={() => setCursor('view', 'VIEW')}
+              onMouseEnter={() => setCursor('open', 'EXPAND')}
               onMouseLeave={resetCursor}
-              role="button"
-              tabIndex={0}
             >
-              <div className="gallery-img-wrap">
+              <div className="atmosphere-img-wrap">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="gallery-photo"
+                  className="atmosphere-img"
                   loading="lazy"
                 />
-                <div className="gallery-overlay">
-                  <div className="overlay-top-tag">
-                    <span className="time-badge">{item.time}</span>
-                    <span className="loc-badge">{item.location}</span>
-                  </div>
-                  <div className="overlay-bottom-title">
-                    <h3 className="card-item-title">{item.title}</h3>
-                    <span className="view-indicator">+</span>
-                  </div>
+                <div className="atmosphere-hover-overlay">
+                  <span className="meta-text overlay-time">{item.time}</span>
+                  <span className="overlay-plus font-mono">+</span>
                 </div>
+              </div>
+              <div className="atmosphere-card-caption">
+                <span className="meta-text">{String(idx + 1).padStart(2, '0')} // {item.location}</span>
+                <h4 className="atmosphere-item-title font-display">{item.title}</h4>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Zoom Modal */}
       {activeModalItem && (
-        <div className="gallery-modal" onClick={() => setActiveModalItem(null)}>
-          <div className="modal-backdrop"></div>
-          <div className="modal-content-box" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="atmosphere-modal-backdrop"
+          onClick={() => setActiveModalItem(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="atmosphere-modal-box" onClick={(e) => e.stopPropagation()}>
             <button
-              className="modal-close-btn"
+              className="modal-close-btn font-mono"
               onClick={() => setActiveModalItem(null)}
-              aria-label="Close image modal"
+              aria-label="Close archive image view"
+              onMouseEnter={() => setCursor('open', 'CLOSE')}
+              onMouseLeave={resetCursor}
             >
-              ✕
+              ✕ CLOSE
             </button>
-            <div className="modal-img-frame">
-              <img src={activeModalItem.image} alt={activeModalItem.title} className="modal-full-img" />
+
+            <div className="modal-image-holder">
+              <img
+                src={activeModalItem.image}
+                alt={activeModalItem.title}
+                className="modal-zoom-image"
+              />
             </div>
-            <div className="modal-info-bar">
+
+            <div className="modal-caption-footer">
               <div>
-                <span className="modal-time">{activeModalItem.time} • {activeModalItem.location}</span>
-                <h4 className="modal-title">{activeModalItem.title}</h4>
+                <span className="meta-text">{activeModalItem.time} • {activeModalItem.location}</span>
+                <h3 className="heading-title modal-heading">{activeModalItem.title}</h3>
               </div>
-              <span className="modal-brand">EMBER & BEAN ARCHIVE</span>
+              <span className="meta-text archive-tag">THE COFFEE HOUSE CO. ARCHIVE</span>
             </div>
           </div>
         </div>
       )}
 
       <style>{`
-        .atmosphere-section {
-          position: relative;
-          background-color: var(--bg-primary);
-          padding-top: clamp(6rem, 10vw, 10rem);
-          padding-bottom: clamp(6rem, 10vw, 10rem);
+        .chc-atmosphere-section {
+          padding-top: clamp(4.5rem, 8vw, 7.5rem);
+          padding-bottom: clamp(4.5rem, 8vw, 7.5rem);
+          background-color: var(--bg-canvas);
+          border-bottom: 1px solid var(--border-hairline);
         }
 
-        .atmosphere-header {
+        .atmosphere-title-grid {
+          margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+        }
+
+        .atmosphere-main-title {
+          letter-spacing: -0.03em;
+        }
+
+        .atmosphere-masonry-grid {
           display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          margin-bottom: 4rem;
-          align-items: flex-end;
-        }
-
-        @media (min-width: 900px) {
-          .atmosphere-header {
-            grid-template-columns: 1.2fr 1fr;
-          }
-        }
-
-        .atmosphere-heading {
-          margin-top: 0.5rem;
-          color: var(--text-primary);
-        }
-
-        /* Editorial Asymmetric Grid */
-        .atmosphere-grid {
-          display: grid;
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 1.5rem;
         }
 
-        @media (min-width: 640px) {
-          .atmosphere-grid {
+        @media (max-width: 900px) {
+          .atmosphere-masonry-grid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
 
-        @media (min-width: 1024px) {
-          .atmosphere-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+        @media (max-width: 600px) {
+          .atmosphere-masonry-grid {
+            grid-template-columns: 1fr;
           }
         }
 
-        .gallery-card {
-          position: relative;
-          border-radius: 4px;
-          overflow: hidden;
-          background-color: #171310;
+        .atmosphere-card {
+          background-color: var(--bg-canvas-subtle);
+          border: 1px solid var(--border-hairline);
+          padding: 0.75rem;
           cursor: pointer;
+          transition: border-color var(--duration-fast) ease;
         }
 
-        .gallery-img-wrap {
+        .atmosphere-card:hover {
+          border-color: var(--border-strong);
+        }
+
+        .atmosphere-img-wrap {
           position: relative;
           width: 100%;
+          aspect-ratio: 4 / 3;
           overflow: hidden;
+          background-color: #E2DDD5;
         }
 
-        .aspect-tall .gallery-img-wrap {
-          padding-bottom: 135%;
+        .card-tall .atmosphere-img-wrap {
+          aspect-ratio: 3 / 4;
         }
 
-        .aspect-portrait .gallery-img-wrap {
-          padding-bottom: 120%;
+        .card-square .atmosphere-img-wrap {
+          aspect-ratio: 1 / 1;
         }
 
-        .aspect-square .gallery-img-wrap {
-          padding-bottom: 100%;
+        .card-portrait .atmosphere-img-wrap {
+          aspect-ratio: 4 / 5;
         }
 
-        .aspect-landscape .gallery-img-wrap {
-          padding-bottom: 80%;
+        .card-landscape .atmosphere-img-wrap {
+          aspect-ratio: 16 / 10;
         }
 
-        .gallery-photo {
-          position: absolute;
-          inset: 0;
+        .atmosphere-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          filter: grayscale(15%) brightness(0.9);
-          transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+          transition: transform 0.6s var(--ease-editorial);
         }
 
-        .gallery-card:hover .gallery-photo {
-          transform: scale(1.06);
-          filter: grayscale(0%) brightness(1);
+        .atmosphere-card:hover .atmosphere-img {
+          transform: scale(1.04);
         }
 
-        .gallery-overlay {
+        .atmosphere-hover-overlay {
           position: absolute;
           inset: 0;
+          background-color: rgba(17, 17, 17, 0.4);
+          opacity: 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.25rem;
+          color: var(--text-inverse);
+          transition: opacity var(--duration-fast) ease;
+        }
+
+        .atmosphere-card:hover .atmosphere-hover-overlay {
+          opacity: 1;
+        }
+
+        .overlay-plus {
+          font-size: 1.5rem;
+        }
+
+        .atmosphere-card-caption {
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          padding: 1.5rem;
-          background: linear-gradient(
-            180deg,
-            rgba(15, 12, 10, 0.4) 0%,
-            transparent 40%,
-            rgba(15, 12, 10, 0.8) 100%
-          );
-          opacity: 0.9;
-          transition: opacity 0.3s ease;
+          gap: 0.35rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid var(--border-hairline);
+          margin-top: 0.75rem;
         }
 
-        .overlay-top-tag {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .time-badge {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.15em;
-          color: var(--accent-copper);
+        .atmosphere-item-title {
+          font-size: 1.05rem;
           font-weight: 600;
-          background: rgba(15, 12, 10, 0.7);
-          padding: 0.25rem 0.6rem;
-          border-radius: 4px;
-        }
-
-        .loc-badge {
-          font-size: 0.625rem;
-          letter-spacing: 0.15em;
-          color: var(--text-muted);
-          text-transform: uppercase;
-        }
-
-        .overlay-bottom-title {
-          display: flex;
-          justify-content: space-between;
-          align-items: baseline;
-        }
-
-        .card-item-title {
-          font-family: var(--font-serif);
-          font-size: 1.25rem;
           color: var(--text-primary);
-          letter-spacing: -0.01em;
-        }
-
-        .view-indicator {
-          font-size: 1.5rem;
-          color: var(--accent-copper);
-          line-height: 1;
         }
 
         /* Modal Lightbox */
-        .gallery-modal {
+        .atmosphere-modal-backdrop {
           position: fixed;
           inset: 0;
+          background-color: rgba(17, 17, 17, 0.92);
+          backdrop-filter: blur(10px);
           z-index: var(--z-modal);
           display: flex;
           align-items: center;
@@ -248,82 +224,59 @@ export const Atmosphere: React.FC = () => {
           padding: 2rem;
         }
 
-        .modal-backdrop {
-          position: absolute;
-          inset: 0;
-          background-color: rgba(10, 8, 7, 0.92);
-          backdrop-filter: blur(16px);
-        }
-
-        .modal-content-box {
+        .atmosphere-modal-box {
           position: relative;
-          z-index: 2;
+          background-color: var(--bg-canvas);
+          border: 1px solid var(--border-hairline);
           max-width: 900px;
           width: 100%;
-          background-color: #171310;
-          border: 1px solid var(--border-light);
-          border-radius: 6px;
-          overflow: hidden;
-          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+          padding: 1.5rem;
         }
 
         .modal-close-btn {
           position: absolute;
-          top: 1rem;
-          right: 1rem;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(15, 12, 10, 0.8);
-          border: 1px solid var(--border-light);
-          color: #FFF;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          top: 1.5rem;
+          right: 1.5rem;
+          font-size: 0.75rem;
+          letter-spacing: 0.14em;
+          padding: 0.4rem 0.8rem;
+          border: 1px solid var(--border-hairline);
+          background-color: var(--bg-canvas);
           z-index: 10;
-          cursor: pointer;
         }
 
-        .modal-img-frame {
+        .modal-image-holder {
+          width: 100%;
           max-height: 70vh;
           overflow: hidden;
-          background: #000;
+          margin-bottom: 1.25rem;
+          background-color: #000;
         }
 
-        .modal-full-img {
+        .modal-zoom-image {
           width: 100%;
-          height: 100%;
-          object-fit: contain;
           max-height: 70vh;
+          object-fit: contain;
         }
 
-        .modal-info-bar {
-          padding: 1.5rem 2rem;
+        .modal-caption-footer {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          background: #1B1613;
-          border-top: 1px solid var(--border-light);
+          align-items: flex-end;
+          border-top: 1px solid var(--border-hairline);
+          padding-top: 1rem;
+          flex-wrap: wrap;
+          gap: 1rem;
         }
 
-        .modal-time {
-          font-size: var(--text-xs);
-          letter-spacing: 0.15em;
-          color: var(--accent-copper);
-          display: block;
-          margin-bottom: 0.25rem;
-        }
-
-        .modal-title {
-          font-family: var(--font-serif);
+        .modal-heading {
           font-size: 1.35rem;
           color: var(--text-primary);
+          margin-top: 0.25rem;
         }
 
-        .modal-brand {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.2em;
-          color: var(--text-muted);
+        .archive-tag {
+          color: var(--accent-terracotta);
         }
       `}</style>
     </section>

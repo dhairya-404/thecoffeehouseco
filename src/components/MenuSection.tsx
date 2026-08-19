@@ -1,337 +1,329 @@
 import React, { useState } from 'react';
 import { MENU_CATEGORIES } from '../data/cafeData';
 import { useCursor } from '../context/CursorContext';
-import { MagneticButton } from './MagneticButton';
 
 export const MenuSection: React.FC = () => {
-  const [activeCategoryId, setActiveCategoryId] = useState('espresso');
+  const [activeCategory, setActiveCategory] = useState(0);
+  const [hoveredItemImage, setHoveredItemImage] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const { setCursor, resetCursor } = useCursor();
 
-  const currentCategory = MENU_CATEGORIES.find((c) => c.id === activeCategoryId) || MENU_CATEGORIES[0];
+  const currentCategory = MENU_CATEGORIES[activeCategory];
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
 
   return (
-    <section id="menu" className="menu-section section-cream" aria-label="Café Menu">
+    <section
+      className="chc-menu-section"
+      id="menu"
+      aria-label="Editorial Coffee and Food Menu"
+      onMouseMove={handleMouseMove}
+    >
       <div className="container">
-        {/* Editorial Section Header */}
-        <div className="menu-header-row">
-          <div className="menu-title-block">
-            <span className="label-caps-dark">CURATED OFFERINGS</span>
-            <h2 className="heading-1 menu-main-heading">
-              THE <span className="font-editorial italic">DAILY</span> TASTING.
+        {/* Section Header */}
+        <div className="section-header">
+          <span className="section-num">04 / THE MENU</span>
+          <span className="section-caption">SEASONAL EXTRACTIONS & ARTISANAL BAKEHOUSE</span>
+        </div>
+
+        {/* Headline */}
+        <div className="swiss-grid menu-title-grid">
+          <div className="col-8 col-lg-8 col-sm-12">
+            <h2 className="heading-section menu-main-heading">
+              CALIBRATED DAILY. HONEST PRICING.
             </h2>
           </div>
-          <div className="menu-header-note">
-            <p className="body-lead-dark">
-              All milk drinks prepared with single-estate whole milk or house-made toasted oat milk. Pastries baked fresh at 6:30 AM daily.
+          <div className="col-4 col-lg-8 col-sm-12 menu-sub-desc">
+            <p className="body-text">
+              All drinks prepared with fresh single-origin beans roasted on-site. Milk beverages feature organic grass-fed whole milk or house-malted oat milk.
             </p>
           </div>
         </div>
 
-        {/* Category Navigation Pills */}
+        {/* Category Selector Tabs */}
         <div className="menu-category-tabs" role="tablist">
-          {MENU_CATEGORIES.map((cat) => (
+          {MENU_CATEGORIES.map((cat, idx) => (
             <button
               key={cat.id}
               role="tab"
-              aria-selected={activeCategoryId === cat.id}
-              className={`menu-pill-btn ${activeCategoryId === cat.id ? 'is-active' : ''}`}
-              onClick={() => setActiveCategoryId(cat.id)}
+              aria-selected={activeCategory === idx}
+              type="button"
+              className={`menu-tab-item ${activeCategory === idx ? 'is-active' : ''}`}
+              onClick={() => setActiveCategory(idx)}
               onMouseEnter={() => setCursor('link')}
               onMouseLeave={resetCursor}
             >
-              <span>{cat.title}</span>
+              <span className="tab-idx meta-text">0{idx + 1}</span>
+              <span className="tab-label font-display">{cat.title}</span>
             </button>
           ))}
         </div>
 
         {/* Category Description Banner */}
-        <div className="category-meta-banner">
-          <span className="cat-desc-text">{currentCategory.description}</span>
-          <span className="cat-tax-note">ALL TAXES INCLUSIVE • GST 5%</span>
+        <div className="menu-category-banner">
+          <span className="meta-text cat-summary-tag">CATEGORY NOTE:</span>
+          <p className="cat-summary-text">{currentCategory.description}</p>
         </div>
 
-        {/* Editorial Menu Item List */}
-        <div className="menu-items-grid">
-          {currentCategory.items.map((item, idx) => (
-            <div
-              key={item.name}
-              className="menu-item-row"
-              onMouseEnter={() => setCursor('open', 'SELECT')}
-              onMouseLeave={resetCursor}
-            >
-              {item.image && (
-                <div className="item-thumb-frame">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="item-thumb-img"
-                    loading="lazy"
-                  />
-                </div>
-              )}
-              <div className="item-details-body">
-                <div className="item-main-line">
-                  <div className="item-title-wrap">
-                    <span className="item-index">{(idx + 1).toString().padStart(2, '0')}</span>
-                    <h3 className="item-name">{item.name}</h3>
+        {/* Typographic Editorial Menu List */}
+        <div className="menu-editorial-list">
+          {currentCategory.items.map((item, idx) => {
+            const itemNum = (idx + 1).toString().padStart(2, '0');
+            return (
+              <div
+                key={item.name}
+                className="menu-list-row"
+                onMouseEnter={() => {
+                  setHoveredItemImage(item.image || null);
+                  setCursor('link');
+                }}
+                onMouseLeave={() => {
+                  setHoveredItemImage(null);
+                  resetCursor();
+                }}
+              >
+                <div className="menu-row-main">
+                  <div className="menu-num-title">
+                    <span className="menu-item-num meta-text">{itemNum}</span>
+                    <h3 className="menu-item-name font-display">{item.name}</h3>
                   </div>
-                  <div className="item-line-connector"></div>
-                  <div className="item-price-badge">{item.price}</div>
+                  <div className="menu-leader-line"></div>
+                  <span className="menu-item-price font-mono">{item.price}</span>
                 </div>
-                <p className="item-description-p">{item.description}</p>
+                <p className="menu-item-description font-sans">{item.description}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Bottom Note & Allergy Notice */}
-        <div className="menu-footer-bar">
-          <div className="allergy-info">
-            <span className="allergy-icon">✦</span>
-            <span>House-made vegan oat milk & gluten-friendly bakery items available upon request.</span>
-          </div>
-
-          <MagneticButton
-            className="btn-magnetic btn-outline-dark"
-            cursorText="PDF"
-            onClick={() => alert('Full Seasonal Tasting Guide & Roaster Notes will be provided at your table.')}
-          >
-            DOWNLOAD TASTING CARD ↓
-          </MagneticButton>
+        {/* Dietary & Origin Note Footer */}
+        <div className="menu-footer-meta">
+          <span className="meta-text">OAT MILK SUBSTITUTION AVAILABLE (+₹40)</span>
+          <span className="meta-text">PRICES INCLUSIVE OF ALL APPLICABLE TAXES</span>
         </div>
       </div>
 
+      {/* Floating Hover Image Preview (Desktop Only) */}
+      {hoveredItemImage && (
+        <div
+          className="menu-floating-preview"
+          style={{
+            transform: `translate3d(${mousePos.x + 24}px, ${mousePos.y - 120}px, 0)`,
+          }}
+        >
+          <img
+            src={hoveredItemImage}
+            alt="Menu item preview"
+            className="menu-preview-img"
+            onError={(e) => {
+              // Fallback to signature cup if image not found
+              (e.target as HTMLImageElement).src = '/assets/brand/coffee-cup/chc_signature_cup_front.jpg';
+            }}
+          />
+        </div>
+      )}
+
       <style>{`
-        .menu-section {
+        .chc-menu-section {
+          padding-top: clamp(4.5rem, 8vw, 7.5rem);
+          padding-bottom: clamp(4.5rem, 8vw, 7.5rem);
+          background-color: var(--bg-canvas);
+          border-bottom: 1px solid var(--border-hairline);
           position: relative;
-          background-color: var(--bg-cream);
-          color: var(--text-dark);
-          padding-top: clamp(6rem, 11vw, 11rem);
-          padding-bottom: clamp(6rem, 11vw, 11rem);
         }
 
-        .label-caps-dark {
-          font-family: var(--font-sans);
-          font-size: var(--text-xs);
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          font-weight: 600;
-          color: #B86338;
-        }
-
-        .menu-header-row {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          margin-bottom: 3.5rem;
-          align-items: flex-end;
-        }
-
-        @media (min-width: 900px) {
-          .menu-header-row {
-            grid-template-columns: 1.2fr 1fr;
-          }
+        .menu-title-grid {
+          margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+          align-items: end;
+          row-gap: 1.5rem;
         }
 
         .menu-main-heading {
-          margin-top: 0.5rem;
-          color: var(--text-dark);
-          letter-spacing: -0.02em;
+          letter-spacing: -0.035em;
+        }
+
+        .menu-sub-desc {
+          color: var(--text-secondary);
         }
 
         .menu-category-tabs {
           display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          margin-bottom: 2.5rem;
-          border-bottom: 1px solid var(--border-dark);
-          padding-bottom: 1.5rem;
+          border-top: 1px solid var(--border-hairline);
+          border-bottom: 1px solid var(--border-hairline);
+          margin-bottom: 2rem;
+          overflow-x: auto;
+          scrollbar-width: none;
         }
 
-        .menu-pill-btn {
-          padding: 0.65rem 1.4rem;
-          border-radius: 9999px;
-          font-size: var(--text-xs);
-          letter-spacing: 0.16em;
+        .menu-category-tabs::-webkit-scrollbar {
+          display: none;
+        }
+
+        .menu-tab-item {
+          flex: 1;
+          min-width: 170px;
+          display: flex;
+          align-items: baseline;
+          gap: 0.65rem;
+          padding: 1.15rem 1.25rem;
+          border-right: 1px solid var(--border-hairline);
+          color: var(--text-muted);
+          transition: all var(--duration-fast) ease;
+          text-align: left;
+        }
+
+        .menu-tab-item:last-child {
+          border-right: none;
+        }
+
+        .menu-tab-item.is-active {
+          background-color: var(--bg-canvas-subtle);
+          color: var(--text-primary);
+        }
+
+        .menu-tab-item.is-active .tab-idx {
+          color: var(--accent-terracotta);
+        }
+
+        .tab-label {
+          font-size: 0.95rem;
           font-weight: 600;
-          text-transform: uppercase;
-          color: var(--text-dark-secondary);
-          background-color: transparent;
-          border: 1px solid var(--border-dark);
-          transition: all 0.3s ease;
+          letter-spacing: 0.04em;
         }
 
-        .menu-pill-btn.is-active {
-          background-color: var(--text-dark);
-          color: var(--bg-cream);
-          border-color: var(--text-dark);
+        .menu-category-banner {
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
+          padding-bottom: 1.5rem;
+          margin-bottom: 1.5rem;
+          border-bottom: 1px solid var(--border-hairline);
+          flex-wrap: wrap;
         }
 
-        .category-meta-banner {
+        .cat-summary-tag {
+          color: var(--accent-terracotta);
+        }
+
+        .cat-summary-text {
+          font-size: var(--text-small);
+          color: var(--text-secondary);
+          font-style: italic;
+        }
+
+        /* Typographic Menu Rows */
+        .menu-editorial-list {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
-          justify-content: space-between;
-          padding: 1rem 1.5rem;
-          background-color: rgba(20, 16, 14, 0.04);
-          border-radius: 4px;
-          margin-bottom: 3rem;
-          font-size: var(--text-xs);
-          color: var(--text-dark-secondary);
         }
 
-        @media (min-width: 768px) {
-          .category-meta-banner {
-            flex-direction: row;
-            align-items: center;
-          }
+        .menu-list-row {
+          padding: 1.35rem 0;
+          border-bottom: 1px solid var(--border-hairline);
+          transition: background-color var(--duration-fast) ease, padding-left var(--duration-fast) ease;
+          cursor: pointer;
         }
 
-        .cat-desc-text {
-          font-style: italic;
-          font-family: var(--font-editorial);
-          font-size: 0.95rem;
+        .menu-list-row:hover {
+          background-color: rgba(17, 17, 17, 0.02);
+          padding-left: 0.75rem;
         }
 
-        .cat-tax-note {
-          letter-spacing: 0.15em;
-          font-size: 0.6875rem;
-          color: #7A7067;
-        }
-
-        .menu-items-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          margin-bottom: 4rem;
-        }
-
-        @media (min-width: 900px) {
-          .menu-items-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 2.5rem 4rem;
-          }
-        }
-
-        .menu-item-row {
-          position: relative;
-          padding: 1.25rem 0;
-          border-bottom: 1px dashed rgba(20, 16, 14, 0.15);
-          transition: transform 0.3s ease;
+        .menu-row-main {
           display: flex;
-          align-items: center;
-          gap: 1.25rem;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1.5rem;
+          margin-bottom: 0.4rem;
         }
 
-        .menu-item-row:hover {
-          transform: translateX(4px);
+        .menu-num-title {
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
         }
 
-        .item-thumb-frame {
-          position: relative;
-          width: 72px;
-          height: 72px;
-          flex-shrink: 0;
-          border-radius: 8px;
+        .menu-item-num {
+          color: var(--accent-terracotta);
+          width: 24px;
+        }
+
+        .menu-item-name {
+          font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+          font-weight: 600;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
+        .menu-leader-line {
+          flex-grow: 1;
+          height: 1px;
+          border-bottom: 1px dotted var(--border-medium);
+          margin: 0 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+          .menu-leader-line {
+            display: none;
+          }
+        }
+
+        .menu-item-price {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          white-space: nowrap;
+        }
+
+        .menu-item-description {
+          font-size: 0.9rem;
+          color: var(--text-muted);
+          padding-left: 2.5rem;
+          max-width: 680px;
+        }
+
+        @media (max-width: 640px) {
+          .menu-item-description {
+            padding-left: 0;
+          }
+        }
+
+        .menu-footer-meta {
+          display: flex;
+          justify-content: space-between;
+          padding-top: 2rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        /* Floating Preview */
+        .menu-floating-preview {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 220px;
+          height: 160px;
+          pointer-events: none;
+          z-index: var(--z-modal);
+          border: 1px solid var(--border-strong);
+          background-color: var(--bg-canvas-dark);
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
           overflow: hidden;
-          background-color: #171310;
-          box-shadow: 0 4px 14px rgba(20, 16, 14, 0.12);
-          border: 1px solid rgba(20, 16, 14, 0.1);
+          transition: transform 0.1s linear;
         }
 
-        .item-thumb-img {
+        @media (max-width: 1024px) {
+          .menu-floating-preview {
+            display: none;
+          }
+        }
+
+        .menu-preview-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .menu-item-row:hover .item-thumb-img {
-          transform: scale(1.1);
-        }
-
-        .item-details-body {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .item-main-line {
-          display: flex;
-          align-items: baseline;
-          gap: 0.75rem;
-          margin-bottom: 0.35rem;
-        }
-
-        .item-title-wrap {
-          display: flex;
-          align-items: baseline;
-          gap: 0.6rem;
-          white-space: nowrap;
-        }
-
-        .item-index {
-          font-size: var(--text-2xs);
-          color: #B86338;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-        }
-
-        .item-name {
-          font-family: var(--font-serif);
-          font-size: 1.15rem;
-          color: var(--text-dark);
-          letter-spacing: -0.01em;
-        }
-
-        .item-line-connector {
-          flex: 1;
-          height: 1px;
-          background-color: rgba(20, 16, 14, 0.12);
-        }
-
-        .item-price-badge {
-          font-family: var(--font-serif);
-          font-size: 1.1rem;
-          color: #B86338;
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .item-description-p {
-          font-size: 0.85rem;
-          line-height: 1.5;
-          color: #61574E;
-          padding-left: 1.5rem;
-          max-width: 95%;
-        }
-
-        .menu-footer-bar {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          justify-content: space-between;
-          align-items: flex-start;
-          border-top: 1px solid var(--border-dark);
-          padding-top: 2rem;
-        }
-
-        @media (min-width: 768px) {
-          .menu-footer-bar {
-            flex-direction: row;
-            align-items: center;
-          }
-        }
-
-        .allergy-info {
-          display: flex;
-          align-items: center;
-          gap: 0.6rem;
-          font-size: var(--text-xs);
-          color: #6B6258;
-        }
-
-        .allergy-icon {
-          color: #B86338;
         }
       `}</style>
     </section>

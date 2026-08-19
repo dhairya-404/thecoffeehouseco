@@ -7,9 +7,9 @@ interface ReservationModalProps {
 }
 
 export const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
-  const [guests, setGuests] = useState('2 Guests');
+  const [guests, setGuests] = useState('2 Guests (Tasting Counter)');
   const [date, setDate] = useState('');
-  const [time, setTime] = useState('17:00');
+  const [time, setTime] = useState('17:00 — Evening Roast');
   const [name, setName] = useState('Dhairya Patel');
   const [phone, setPhone] = useState('+91 98765 43210');
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -23,228 +23,271 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onCl
     setTimeout(() => {
       setIsSubmitted(false);
       onClose();
-    }, 2500);
+    }, 2800);
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+    <div className="chc-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="chc-modal-card" onClick={(e) => e.stopPropagation()}>
         <button
-          className="modal-close-btn"
+          className="chc-modal-close font-mono"
           onClick={onClose}
           aria-label="Close modal"
           onMouseEnter={() => setCursor('open', 'CLOSE')}
           onMouseLeave={resetCursor}
         >
-          ✕
+          ✕ CLOSE
         </button>
 
         {isSubmitted ? (
-          <div className="modal-success-box">
-            <div className="success-icon">✦</div>
-            <h3 className="heading-3">TABLE RESERVED</h3>
-            <p className="body-lead">
-              Thank you, {name}! Your tasting table for {guests} is reserved for {date || 'today'} at {time}. We look forward to welcoming you.
+          <div className="chc-modal-success">
+            <span className="meta-text success-tag">CONFIRMATION #CHC-{Math.floor(1000 + Math.random() * 9000)}</span>
+            <h3 className="heading-section success-title">TABLE RESERVED.</h3>
+            <p className="body-lead success-message">
+              Thank you, {name}. Your tasting table for {guests} is scheduled for {date || 'today'} at {time}. We look forward to your arrival at 21 Riverfront Road.
             </p>
+            <div className="success-footer font-mono meta-text">
+              NOTIFICATION SENT TO {phone}
+            </div>
           </div>
         ) : (
-          <form className="modal-form" onSubmit={handleSubmit}>
-            <div className="modal-header">
-              <span className="label-caps">SEASONAL TASTING TABLE</span>
-              <h2 className="heading-2">RESERVE AT EMBER & BEAN</h2>
-              <p className="modal-sub">Sabarmati Riverfront • Ahmedabad</p>
+          <form className="chc-modal-form" onSubmit={handleSubmit}>
+            <div className="chc-modal-header">
+              <span className="meta-text modal-index">09 / RESERVATION DESK</span>
+              <h2 className="heading-section modal-title">BOOK A TASTING TABLE</h2>
+              <p className="body-text modal-sub">24 seats total. Advance reservation recommended.</p>
             </div>
 
-            <div className="form-grid">
-              <div className="form-group">
-                <label className="form-label">GUESTS</label>
+            <div className="modal-field-grid">
+              <div className="modal-field">
+                <label className="meta-text field-label">01 // GUEST COUNT</label>
                 <select
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
-                  className="form-input"
+                  className="field-input font-sans"
                 >
                   <option>1 Guest (Solo Bar Seat)</option>
                   <option>2 Guests (Tasting Counter)</option>
                   <option>4 Guests (Courtyard Table)</option>
-                  <option>6+ Guests (Private Atelier)</option>
+                  <option>6 Guests (Private Atelier)</option>
                 </select>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">DATE</label>
+              <div className="modal-field">
+                <label className="meta-text field-label">02 // PREFERRED DATE</label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="form-input"
+                  className="field-input font-sans"
+                  required
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">PREFERRED TIME</label>
+              <div className="modal-field">
+                <label className="meta-text field-label">03 // SEATING TIME</label>
                 <select
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="form-input"
+                  className="field-input font-sans"
                 >
-                  <option value="08:00">08:00 AM — Morning Drip</option>
-                  <option value="11:30">11:30 AM — Midday Pour</option>
-                  <option value="17:00">05:00 PM — Evening Roast</option>
-                  <option value="20:00">08:00 PM — Night Tasting</option>
+                  <option>08:00 — Morning Extraction</option>
+                  <option>11:30 — Midday Pour Over</option>
+                  <option>17:00 — Evening Roast</option>
+                  <option>20:00 — Night Tasting Flight</option>
                 </select>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">FULL NAME</label>
+              <div className="modal-field">
+                <label className="meta-text field-label">04 // FULL NAME</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="form-input"
+                  className="field-input font-sans"
                   placeholder="Your Name"
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">PHONE NUMBER</label>
+              <div className="modal-field full-width-field">
+                <label className="meta-text field-label">05 // TELEPHONE NUMBER</label>
                 <input
                   type="tel"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="form-input"
-                  placeholder="+91 Phone"
+                  className="field-input font-sans"
+                  placeholder="+91 Mobile Number"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="btn-magnetic btn-primary modal-submit-btn"
-              onMouseEnter={() => setCursor('link')}
-              onMouseLeave={resetCursor}
-            >
-              CONFIRM RESERVATION →
-            </button>
+            <div className="modal-submit-wrap">
+              <button
+                type="submit"
+                className="btn-swiss modal-submit-action"
+                onMouseEnter={() => setCursor('link')}
+                onMouseLeave={resetCursor}
+              >
+                <span>CONFIRM RESERVATION</span>
+                <span>→</span>
+              </button>
+              <span className="meta-text cancellation-note">FREE CANCELLATION UP TO 2 HOURS PRIOR</span>
+            </div>
           </form>
         )}
       </div>
 
       <style>{`
-        .modal-backdrop {
+        .chc-modal-backdrop {
           position: fixed;
           inset: 0;
           z-index: var(--z-modal);
-          background-color: rgba(10, 8, 7, 0.85);
+          background-color: rgba(17, 17, 17, 0.88);
           backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 1.5rem;
-          animation: fadeIn 0.3s ease;
         }
 
-        .modal-card {
+        .chc-modal-card {
           position: relative;
           width: 100%;
-          max-width: 540px;
-          background: #181412;
-          border: 1px solid var(--border-light);
-          border-radius: 12px;
-          padding: 2.5rem 2rem;
-          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+          max-width: 620px;
+          background-color: var(--bg-canvas);
+          border: 1px solid var(--border-strong);
+          padding: clamp(2rem, 5vw, 3.5rem);
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
         }
 
-        .modal-close-btn {
+        .chc-modal-close {
           position: absolute;
           top: 1.25rem;
           right: 1.25rem;
-          background: transparent;
-          border: none;
-          color: var(--text-muted);
-          font-size: 1.2rem;
-          cursor: pointer;
-          transition: color 0.2s ease;
+          font-size: 0.75rem;
+          letter-spacing: 0.14em;
+          padding: 0.4rem 0.8rem;
+          border: 1px solid var(--border-hairline);
+          background-color: var(--bg-canvas);
+          color: var(--text-primary);
+          transition: all var(--duration-fast) ease;
         }
 
-        .modal-close-btn:hover {
-          color: var(--accent-copper);
+        .chc-modal-close:hover {
+          background-color: var(--text-primary);
+          color: var(--bg-canvas);
         }
 
-        .modal-header {
+        .chc-modal-header {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
           margin-bottom: 2rem;
+          padding-bottom: 1.25rem;
+          border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .modal-index {
+          color: var(--accent-terracotta);
+        }
+
+        .modal-title {
+          letter-spacing: -0.03em;
         }
 
         .modal-sub {
-          font-size: 0.8rem;
           color: var(--text-muted);
-          margin-top: 0.25rem;
-          letter-spacing: 0.05em;
+          font-size: 0.9rem;
         }
 
-        .form-grid {
+        .modal-field-grid {
           display: grid;
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(2, 1fr);
           gap: 1.25rem;
           margin-bottom: 2rem;
         }
 
-        @media (min-width: 600px) {
-          .form-grid {
-            grid-template-columns: 1fr 1fr;
+        @media (max-width: 600px) {
+          .modal-field-grid {
+            grid-template-columns: 1fr;
           }
         }
 
-        .form-group {
+        .full-width-field {
+          grid-column: 1 / -1;
+        }
+
+        .modal-field {
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          gap: 0.5rem;
         }
 
-        .form-label {
-          font-size: 0.65rem;
-          letter-spacing: 0.18em;
-          color: var(--accent-copper);
-          font-weight: 600;
+        .field-label {
+          color: var(--text-muted);
+          font-size: 0.6875rem;
         }
 
-        .form-input {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid var(--border-light);
-          border-radius: 6px;
-          padding: 0.75rem 1rem;
+        .field-input {
+          background-color: var(--bg-canvas-subtle);
+          border: 1px solid var(--border-hairline);
+          padding: 0.85rem 1rem;
           color: var(--text-primary);
-          font-family: var(--font-sans);
-          font-size: 0.9rem;
+          font-size: 0.95rem;
           outline: none;
-          transition: border-color 0.2s ease;
+          transition: border-color var(--duration-fast) ease;
         }
 
-        .form-input:focus {
-          border-color: var(--accent-copper);
+        .field-input:focus {
+          border-color: var(--border-strong);
+          background-color: var(--bg-canvas);
         }
 
-        .modal-submit-btn {
+        .modal-submit-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .modal-submit-action {
           width: 100%;
-          justify-content: center;
-          padding: 0.9rem;
+          padding: 1.1rem;
         }
 
-        .modal-success-box {
+        .cancellation-note {
           text-align: center;
-          padding: 2rem 1rem;
+          color: var(--text-muted);
+          font-size: 0.6875rem;
         }
 
-        .success-icon {
-          font-size: 2.5rem;
-          color: var(--accent-copper);
-          margin-bottom: 1rem;
+        /* Success Card */
+        .chc-modal-success {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          padding: 1rem 0;
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
+        .success-tag {
+          color: var(--accent-terracotta);
+        }
+
+        .success-title {
+          color: var(--text-primary);
+        }
+
+        .success-message {
+          color: var(--text-secondary);
+        }
+
+        .success-footer {
+          padding-top: 1.25rem;
+          border-top: 1px solid var(--border-hairline);
+          color: var(--text-muted);
+          font-size: 0.75rem;
         }
       `}</style>
     </div>

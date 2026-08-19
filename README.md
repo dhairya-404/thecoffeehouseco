@@ -1,11 +1,9 @@
-# React + TypeScript + Vite
+# THE COFFEE HOUSE CO.
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> Contemporary Specialty Coffee House & Roastery • Ahmedabad  
+> Swiss International Typographic Style × Editorial Design × Specialty Coffee Culture
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+A complete V2 redesign featuring an editorial publication aesthetic, responsive 12-column Swiss grid system, subtle micro-interactions, custom Web Audio ambient soundscape, live tasting table reservation flow, and tactile typography.
 
 ## React Compiler
 

@@ -363,17 +363,18 @@ export const GALLERY_ITEMS: GalleryItem[] = [
 ];
 
 export const CAFE_INFO = {
-  name: 'EMBER & BEAN',
-  tagline: 'Coffee, slowly made.',
-  established: 'EST. 2018 / AHMEDABAD',
+  name: 'THE COFFEE HOUSE CO.',
+  shortName: 'CHC',
+  tagline: 'COFFEE / FOOD / CULTURE',
+  established: 'EST. 2019 / AHMEDABAD',
   address: '21 Riverfront Road, Ahmedabad, Gujarat 380009',
   coordinates: '23.0225° N, 72.5714° E',
   phone: '+91 (079) 4921-8800',
-  email: 'hello@emberandbean.in',
-  instagram: '@emberandbeancoffee',
+  email: 'hello@thecoffeehouse.co',
+  instagram: '@thecoffeehouseco',
   hours: [
-    { days: 'Monday – Friday', time: '07:00 – 22:00' },
-    { days: 'Saturday – Sunday', time: '08:00 – 23:00' }
+    { days: 'Monday – Friday', time: '07:00 — 22:00' },
+    { days: 'Saturday – Sunday', time: '08:00 — 23:00' }
   ],
   features: [
     'Direct Trade Microlots',
