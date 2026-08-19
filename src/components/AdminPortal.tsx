@@ -126,7 +126,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           <div className="admin-metric-box">
             <span className="meta-text">CAPACITY OCCUPIED</span>
             <span className="metric-val font-display">
-              {totalGuestsBooked} <span className="capacity-max font-mono">/ 24 SEATS</span>
+              {totalGuestsBooked} <span className="capacity-max font-mono">/ 30 SEATS</span>
             </span>
           </div>
           <div className="admin-metric-box">

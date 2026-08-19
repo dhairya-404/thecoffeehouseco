@@ -144,6 +144,7 @@ export const Footer: React.FC = () => {
         <div className="footer-bottom-row">
           <div className="footer-copyright font-mono meta-text">
             © {new Date().getFullYear()} THE COFFEE HOUSE CO. ALL RIGHTS RESERVED.
+            <a href="#admin" className="footer-admin-link">STAFF CONSOLE ⚙</a>
           </div>
 
           <button
@@ -305,7 +306,23 @@ export const Footer: React.FC = () => {
         }
 
         .footer-copyright {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
           color: var(--text-muted);
+          flex-wrap: wrap;
+        }
+
+        .footer-admin-link {
+          color: var(--accent-terracotta);
+          text-decoration: underline;
+          cursor: pointer;
+          font-size: 0.6875rem;
+          transition: opacity var(--duration-fast) ease;
+        }
+
+        .footer-admin-link:hover {
+          opacity: 0.8;
         }
 
         .footer-back-to-top {

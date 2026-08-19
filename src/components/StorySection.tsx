@@ -61,7 +61,7 @@ export const StorySection: React.FC = () => {
             {/* Swiss Numbered Architectural Pillars */}
             <div className="story-metrics-grid">
               <div className="story-metric-item">
-                <span className="metric-digit font-display">24</span>
+                <span className="metric-digit font-display">30</span>
                 <span className="metric-label meta-text">SEATS TOTAL FOR INTIMATE DIALOGUE</span>
               </div>
               <div className="story-metric-item">

@@ -39,6 +39,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin })
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle mobile menu scroll locking and escape key
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsMobileMenuOpen(false);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isMobileMenuOpen]);
+
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
@@ -156,8 +175,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin })
       >
         <div className="container mobile-drawer-inner">
           <div className="mobile-drawer-header">
-            <span className="font-display mobile-brand">THE COFFEE HOUSE CO.</span>
-            <span className="meta-text">EST. 2019 / AHMEDABAD</span>
+            <div className="mobile-drawer-header-top">
+              <div className="mobile-drawer-brand">
+                <span className="font-display mobile-brand">THE COFFEE HOUSE CO.</span>
+                <span className="meta-text">EST. 2019 / AHMEDABAD</span>
+              </div>
+              <button
+                type="button"
+                className="mobile-drawer-close-btn font-mono"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
+              >
+                ✕ CLOSE
+              </button>
+            </div>
           </div>
 
           <nav className="mobile-nav-menu">
@@ -185,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin })
               onClick={toggleTheme}
               style={{ marginBottom: '0.75rem' }}
             >
-              <span>THEME: {isDark ? 'LIGHT (WARM IVORY)' : 'DARK (ARCHITECTURAL)'}</span>
+              <span>THEME: {isDark ? 'LIGHT (WARM Ivory)' : 'DARK (ARCHITECTURAL)'}</span>
             </button>
             <button
               type="button"
@@ -454,15 +485,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin })
         }
 
         .mobile-drawer-header {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-          padding-bottom: 1.5rem;
+          padding-bottom: 1.25rem;
           border-bottom: 1px solid var(--border-hairline);
         }
 
+        .mobile-drawer-header-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+
+        .mobile-drawer-brand {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+        }
+
+        .mobile-drawer-close-btn {
+          font-size: 0.75rem;
+          letter-spacing: 0.12em;
+          padding: 0.5rem 0.85rem;
+          border: 1px solid var(--border-hairline);
+          background-color: transparent;
+          color: var(--text-primary);
+          cursor: pointer;
+          transition: all var(--duration-fast) ease;
+        }
+
+        .mobile-drawer-close-btn:hover {
+          background-color: var(--text-primary);
+          color: var(--bg-canvas);
+        }
+
         .mobile-brand {
-          font-size: 1.35rem;
+          font-size: 1.25rem;
           font-weight: 700;
         }
 
