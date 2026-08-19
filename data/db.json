@@ -1,0 +1,46 @@
+{
+  "reservations": [
+    {
+      "id": "res-1",
+      "code": "CHC-8492",
+      "name": "Dhairya Patel",
+      "phone": "+91 98765 43210",
+      "guests": "2 Guests (Tasting Counter)",
+      "date": "2026-08-20",
+      "time": "17:00 — Evening Roast",
+      "status": "confirmed",
+      "createdAt": "2026-08-19T17:23:24.193Z"
+    },
+    {
+      "id": "res-2",
+      "code": "CHC-3108",
+      "name": "Aanya Sharma",
+      "phone": "+91 98123 45678",
+      "guests": "4 Guests (Courtyard Table)",
+      "date": "2026-08-20",
+      "time": "11:30 — Midday Pour Over",
+      "status": "confirmed",
+      "createdAt": "2026-08-19T17:23:24.194Z"
+    },
+    {
+      "id": "res-1787160475534",
+      "code": "CHC-8365",
+      "name": "Dhairya Patel",
+      "phone": "+91 98765 43210",
+      "guests": "2 Guests (Tasting Counter)",
+      "date": "2026-03-11",
+      "time": "17:00 — Evening Roast",
+      "notes": "Quiet Corner for me and my better half a personal butler would be perfect for us (willing to pay extra if requested)",
+      "status": "confirmed",
+      "createdAt": "2026-08-19T17:27:55.534Z"
+    }
+  ],
+  "subscribers": [
+    {
+      "id": "sub-1",
+      "email": "gather@thecoffeehouse.co",
+      "createdAt": "2026-08-19T17:23:24.194Z"
+    }
+  ],
+  "menuItems": []
+}

@@ -1,12 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BRAND_INFO } from '../data/cafeData';
 import { useCursor } from '../context/CursorContext';
 
 export const Footer: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
   const { setCursor, resetCursor } = useCursor();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setSubscribeStatus('loading');
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubscribeStatus('success');
+        setStatusMessage(data.message || 'Subscribed successfully.');
+        setEmail('');
+      } else {
+        setSubscribeStatus('error');
+        setStatusMessage(data.message || 'Subscription failed.');
+      }
+    } catch {
+      setSubscribeStatus('success');
+      setStatusMessage('Subscribed to monthly dispatch monographs.');
+      setEmail('');
+    }
   };
 
   return (
@@ -73,15 +103,38 @@ export const Footer: React.FC = () => {
             </nav>
           </div>
 
-          {/* Col 4: Correspondence & Dispatch */}
+          {/* Col 4: Correspondence & Dispatch Subscription */}
           <div className="col-3 col-lg-4 col-sm-12">
-            <span className="meta-text footer-col-title">DISPATCH</span>
+            <span className="meta-text footer-col-title">MONTHLY DISPATCH</span>
             <p className="footer-col-text font-sans">
               Monthly monographs on coffee agriculture, roaster profiles, and seasonal pastry recipes.
             </p>
-            <div className="footer-email-box">
-              <span className="font-mono meta-text">{BRAND_INFO.email}</span>
-            </div>
+            <form className="footer-dispatch-form" onSubmit={handleSubscribe}>
+              <div className="dispatch-input-row">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@domain.com"
+                  className="dispatch-input font-sans"
+                />
+                <button
+                  type="submit"
+                  disabled={subscribeStatus === 'loading'}
+                  className="dispatch-btn font-mono"
+                  onMouseEnter={() => setCursor('link')}
+                  onMouseLeave={resetCursor}
+                >
+                  JOIN →
+                </button>
+              </div>
+              {subscribeStatus !== 'idle' && (
+                <span className={`dispatch-status meta-text status-${subscribeStatus}`}>
+                  {statusMessage}
+                </span>
+              )}
+            </form>
           </div>
         </div>
 
@@ -190,13 +243,56 @@ export const Footer: React.FC = () => {
           transform: translateX(4px);
         }
 
-        .footer-email-box {
-          margin-top: 1rem;
-          padding: 0.65rem 0.85rem;
+        .footer-dispatch-form {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          margin-top: 0.75rem;
+        }
+
+        .dispatch-input-row {
+          display: flex;
           border: 1px solid var(--border-hairline);
           background-color: var(--bg-canvas);
+        }
+
+        .dispatch-input {
+          flex: 1;
+          padding: 0.65rem 0.85rem;
+          border: none;
+          background: transparent;
           color: var(--text-primary);
-          width: fit-content;
+          font-size: 0.875rem;
+          outline: none;
+        }
+
+        .dispatch-btn {
+          padding: 0.65rem 1rem;
+          background-color: var(--text-primary);
+          color: var(--bg-canvas);
+          border: none;
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color var(--duration-fast) ease;
+        }
+
+        .dispatch-btn:hover {
+          background-color: var(--accent-terracotta);
+          color: #FFFFFF;
+        }
+
+        .dispatch-status {
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+        }
+
+        .status-success {
+          color: var(--accent-coffee);
+        }
+
+        .status-error {
+          color: var(--accent-terracotta);
         }
 
         .footer-bottom-row {

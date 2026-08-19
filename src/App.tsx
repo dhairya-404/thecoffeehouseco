@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CursorProvider } from './context/CursorContext';
@@ -6,6 +6,7 @@ import { CustomCursor } from './components/CustomCursor';
 import { Preloader } from './components/Preloader';
 import { NoiseCanvas } from './components/NoiseCanvas';
 import { ReservationModal } from './components/ReservationModal';
+import { AdminPortal } from './components/AdminPortal';
 import { useLenis } from './hooks/useLenis';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -18,18 +19,42 @@ import { Atmosphere } from './components/Atmosphere';
 import { Location } from './components/Location';
 import { Footer } from './components/Footer';
 
-// Register ScrollTrigger so we can call refresh
+// Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
 function CafeApp() {
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
   // Initialize Lenis smooth scroll
   useLenis();
 
+  // Listen for hash #admin or keyboard shortcut Shift+A
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('keydown', handleKeyDown);
+    handleHash();
+
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleLoadingComplete = () => {
     setLoadingComplete(true);
-    // Allow DOM to settle then recalculate GSAP scroll trigger offsets
     setTimeout(() => {
       ScrollTrigger.refresh();
     }, 100);
@@ -46,13 +71,27 @@ function CafeApp() {
       {/* Reservation Modal */}
       <ReservationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
+      {/* Admin Reservations & Dispatch Portal */}
+      <AdminPortal
+        isOpen={isAdminOpen}
+        onClose={() => {
+          setIsAdminOpen(false);
+          if (window.location.hash === '#admin') {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }}
+      />
+
       {/* Preloader Curtain */}
       {!loadingComplete && (
         <Preloader onComplete={handleLoadingComplete} />
       )}
 
       {/* Main Navigation Header */}
-      <Navbar onBookTableClick={() => setIsModalOpen(true)} />
+      <Navbar
+        onBookTableClick={() => setIsModalOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
+      />
 
       {/* Page Content */}
       <main id="main-content">
