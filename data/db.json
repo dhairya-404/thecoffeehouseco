@@ -8,7 +8,7 @@
       "guests": "2 Guests (Tasting Counter)",
       "date": "2026-08-20",
       "time": "17:00 — Evening Roast",
-      "status": "confirmed",
+      "status": "seated",
       "createdAt": "2026-08-19T17:23:24.193Z"
     },
     {
@@ -19,7 +19,7 @@
       "guests": "4 Guests (Courtyard Table)",
       "date": "2026-08-20",
       "time": "11:30 — Midday Pour Over",
-      "status": "confirmed",
+      "status": "seated",
       "createdAt": "2026-08-19T17:23:24.194Z"
     },
     {
@@ -31,7 +31,7 @@
       "date": "2026-03-11",
       "time": "17:00 — Evening Roast",
       "notes": "Quiet Corner for me and my better half a personal butler would be perfect for us (willing to pay extra if requested)",
-      "status": "confirmed",
+      "status": "seated",
       "createdAt": "2026-08-19T17:27:55.534Z"
     }
   ],
@@ -40,6 +40,11 @@
       "id": "sub-1",
       "email": "gather@thecoffeehouse.co",
       "createdAt": "2026-08-19T17:23:24.194Z"
+    },
+    {
+      "id": "sub-1787184407215",
+      "email": "dshsdh@gmail.com",
+      "createdAt": "2026-08-20T00:06:47.222Z"
     }
   ],
   "menuItems": []

@@ -84,15 +84,32 @@ export const MenuSection: React.FC = () => {
                   resetCursor();
                 }}
               >
-                <div className="menu-row-main">
-                  <div className="menu-num-title">
-                    <span className="menu-item-num meta-text">{itemNum}</span>
-                    <h3 className="menu-item-name font-display">{item.name}</h3>
+                {/* Mobile & Tablet Inline Thumbnail */}
+                {item.image && (
+                  <div className="menu-item-thumb-wrap">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="menu-item-thumb-img"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                   </div>
-                  <div className="menu-leader-line"></div>
-                  <span className="menu-item-price font-mono">{item.price}</span>
+                )}
+
+                <div className="menu-item-content">
+                  <div className="menu-row-main">
+                    <div className="menu-num-title">
+                      <span className="menu-item-num meta-text">{itemNum}</span>
+                      <h3 className="menu-item-name font-display">{item.name}</h3>
+                    </div>
+                    <div className="menu-leader-line"></div>
+                    <span className="menu-item-price font-mono">{item.price}</span>
+                  </div>
+                  <p className="menu-item-description font-sans">{item.description}</p>
                 </div>
-                <p className="menu-item-description font-sans">{item.description}</p>
               </div>
             );
           })}
@@ -105,7 +122,7 @@ export const MenuSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Hover Image Preview (Desktop Only) */}
+      {/* Floating Hover Image Preview (Desktop Pointer Only) */}
       {hoveredItemImage && (
         <div
           className="menu-floating-preview"
@@ -118,8 +135,7 @@ export const MenuSection: React.FC = () => {
             alt="Menu item preview"
             className="menu-preview-img"
             onError={(e) => {
-              // Fallback to signature cup if image not found
-              (e.target as HTMLImageElement).src = '/assets/brand/coffee-cup/chc_signature_cup_front.jpg';
+              (e.target as HTMLImageElement).src = '/images/coffee_espresso.jpg';
             }}
           />
         </div>
@@ -155,6 +171,7 @@ export const MenuSection: React.FC = () => {
           margin-bottom: 2rem;
           overflow-x: auto;
           scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
         }
 
         .menu-category-tabs::-webkit-scrollbar {
@@ -220,15 +237,55 @@ export const MenuSection: React.FC = () => {
         }
 
         .menu-list-row {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
           padding: 1.35rem 0;
           border-bottom: 1px solid var(--border-hairline);
-          transition: background-color var(--duration-fast) ease, padding-left var(--duration-fast) ease;
+          transition: background-color var(--duration-fast) ease, padding var(--duration-fast) ease;
           cursor: pointer;
         }
 
-        .menu-list-row:hover {
-          background-color: rgba(17, 17, 17, 0.02);
-          padding-left: 0.75rem;
+        @media (hover: hover) {
+          .menu-list-row:hover {
+            background-color: rgba(17, 17, 17, 0.02);
+            padding-left: 0.75rem;
+          }
+        }
+
+        .menu-item-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+
+        /* Mobile & Tablet Thumbnail Image */
+        .menu-item-thumb-wrap {
+          display: none;
+          width: 72px;
+          height: 72px;
+          flex-shrink: 0;
+          border-radius: 4px;
+          overflow: hidden;
+          background-color: var(--bg-canvas-subtle);
+          border: 1px solid var(--border-hairline);
+        }
+
+        .menu-item-thumb-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        @media (max-width: 900px) {
+          .menu-item-thumb-wrap {
+            display: block;
+          }
+          .menu-list-row {
+            align-items: flex-start;
+            padding: 1.15rem 0;
+          }
         }
 
         .menu-row-main {
@@ -248,10 +305,11 @@ export const MenuSection: React.FC = () => {
         .menu-item-num {
           color: var(--accent-terracotta);
           width: 24px;
+          flex-shrink: 0;
         }
 
         .menu-item-name {
-          font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+          font-size: clamp(1.15rem, 1.8vw, 1.6rem);
           font-weight: 600;
           letter-spacing: -0.02em;
           color: var(--text-primary);
@@ -284,9 +342,11 @@ export const MenuSection: React.FC = () => {
           max-width: 680px;
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 900px) {
           .menu-item-description {
             padding-left: 0;
+            font-size: 0.85rem;
+            line-height: 1.45;
           }
         }
 
@@ -298,7 +358,7 @@ export const MenuSection: React.FC = () => {
           gap: 1rem;
         }
 
-        /* Floating Preview */
+        /* Floating Preview for Desktop */
         .menu-floating-preview {
           position: fixed;
           top: 0;
@@ -314,9 +374,9 @@ export const MenuSection: React.FC = () => {
           transition: transform 0.1s linear;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 900px) {
           .menu-floating-preview {
-            display: none;
+            display: none !important;
           }
         }
 

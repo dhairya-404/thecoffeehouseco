@@ -4,10 +4,9 @@ import { useAudioAmbience } from '../hooks/useAudioAmbience';
 
 interface NavbarProps {
   onBookTableClick?: () => void;
-  onOpenAdmin?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
@@ -230,18 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick, onOpenAdmin })
             </button>
             <div className="mobile-meta-row">
               <span className="meta-text">21 RIVERFRONT ROAD</span>
-              {onOpenAdmin && (
-                <button
-                  type="button"
-                  className="meta-text staff-link-btn"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenAdmin();
-                  }}
-                >
-                  STAFF CONSOLE ⚙
-                </button>
-              )}
+              <span className="meta-text">AHMEDABAD, GUJARAT</span>
             </div>
           </div>
         </div>

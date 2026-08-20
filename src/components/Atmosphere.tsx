@@ -48,7 +48,10 @@ export const Atmosphere: React.FC = () => {
                 </div>
               </div>
               <div className="atmosphere-card-caption">
-                <span className="meta-text">{String(idx + 1).padStart(2, '0')} // {item.location}</span>
+                <div className="atmosphere-caption-row">
+                  <span className="meta-text">{String(idx + 1).padStart(2, '0')} // {item.location}</span>
+                  <span className="mobile-zoom-pill meta-text">TAP TO VIEW ↗</span>
+                </div>
                 <h4 className="atmosphere-item-title font-display">{item.title}</h4>
               </div>
             </div>
@@ -111,20 +114,20 @@ export const Atmosphere: React.FC = () => {
         }
 
         .atmosphere-masonry-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          column-count: 3;
+          column-gap: 1.5rem;
         }
 
         @media (max-width: 900px) {
           .atmosphere-masonry-grid {
-            grid-template-columns: repeat(2, 1fr);
+            column-count: 2;
+            column-gap: 1rem;
           }
         }
 
         @media (max-width: 600px) {
           .atmosphere-masonry-grid {
-            grid-template-columns: 1fr;
+            column-count: 1;
           }
         }
 
@@ -133,11 +136,28 @@ export const Atmosphere: React.FC = () => {
           border: 1px solid var(--border-hairline);
           padding: 0.75rem;
           cursor: pointer;
-          transition: border-color var(--duration-fast) ease;
+          break-inside: avoid;
+          margin-bottom: 1.5rem;
+          transition: border-color var(--duration-fast) ease, transform 0.2s ease;
+          -webkit-tap-highlight-color: transparent;
         }
 
-        .atmosphere-card:hover {
-          border-color: var(--border-strong);
+        .atmosphere-card:active {
+          transform: scale(0.985);
+        }
+
+        @media (hover: hover) {
+          .atmosphere-card:hover {
+            border-color: var(--border-strong);
+          }
+
+          .atmosphere-card:hover .atmosphere-img {
+            transform: scale(1.04);
+          }
+
+          .atmosphere-card:hover .atmosphere-hover-overlay {
+            opacity: 1;
+          }
         }
 
         .atmosphere-img-wrap {
@@ -171,10 +191,6 @@ export const Atmosphere: React.FC = () => {
           transition: transform 0.6s var(--ease-editorial);
         }
 
-        .atmosphere-card:hover .atmosphere-img {
-          transform: scale(1.04);
-        }
-
         .atmosphere-hover-overlay {
           position: absolute;
           inset: 0;
@@ -188,10 +204,6 @@ export const Atmosphere: React.FC = () => {
           transition: opacity var(--duration-fast) ease;
         }
 
-        .atmosphere-card:hover .atmosphere-hover-overlay {
-          opacity: 1;
-        }
-
         .overlay-plus {
           font-size: 1.5rem;
         }
@@ -203,6 +215,25 @@ export const Atmosphere: React.FC = () => {
           padding-top: 0.75rem;
           border-top: 1px solid var(--border-hairline);
           margin-top: 0.75rem;
+        }
+
+        .atmosphere-caption-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .mobile-zoom-pill {
+          display: none;
+          font-size: 0.625rem;
+          color: var(--accent-terracotta);
+          letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 900px) {
+          .mobile-zoom-pill {
+            display: inline-block;
+          }
         }
 
         .atmosphere-item-title {

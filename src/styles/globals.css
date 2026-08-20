@@ -219,106 +219,10 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* Cursor: dot */
-.custom-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: var(--z-cursor);
-  mix-blend-mode: difference;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  will-change: transform;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.custom-cursor.is-visible {
-  opacity: 1;
-}
-
-.custom-cursor.is-hidden {
-  opacity: 0 !important;
-  visibility: hidden;
-}
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #FFFFFF;
-  border-radius: 50%;
-}
-
-/* Cursor: expanded ring */
+/* Custom cursor styles (disabled) */
+.custom-cursor,
 .cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: calc(var(--z-cursor) - 1);
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: width 0.3s var(--ease-cinematic),
-              height 0.3s var(--ease-cinematic),
-              background-color 0.3s ease,
-              border-color 0.3s ease,
-              opacity 0.3s ease;
-  will-change: transform;
-  opacity: 0;
-}
-
-.cursor-ring.is-visible {
-  opacity: 1;
-}
-
-.cursor-ring.is-hidden {
-  opacity: 0 !important;
-  visibility: hidden;
-}
-
-.cursor-text {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.55rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #0F0C0A;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  font-weight: 700;
-}
-
-.cursor-ring.cursor-active {
-  width: 72px;
-  height: 72px;
-  background-color: #FFFFFF;
-  border-color: #FFFFFF;
-}
-
-.cursor-ring.cursor-active .cursor-text {
-  opacity: 1;
-}
-
-/* Reduced Motion: hide cursors, reduce animations */
-@media (prefers-reduced-motion: reduce) {
-  .custom-cursor,
-  .cursor-ring {
-    display: none !important;
-  }
-}
-
-/* Touch devices: hide custom cursor */
-@media (pointer: coarse) {
-  .custom-cursor,
-  .cursor-ring {
-    display: none !important;
-  }
+  display: none !important;
 }
 
 /* Utility: label-caps for dark backgrounds */

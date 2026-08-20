@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CursorProvider } from './context/CursorContext';
-import { CustomCursor } from './components/CustomCursor';
 import { Preloader } from './components/Preloader';
 import { NoiseCanvas } from './components/NoiseCanvas';
 import { ReservationModal } from './components/ReservationModal';
@@ -30,26 +29,21 @@ function CafeApp() {
   // Initialize Lenis smooth scroll
   useLenis();
 
-  // Listen for hash #admin or keyboard shortcut Shift+A
+  // Listen for explicit hash #admin only if staff manually opens with #admin
   useEffect(() => {
     const handleHash = () => {
       if (window.location.hash === '#admin') {
         setIsAdminOpen(true);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        setIsAdminOpen((prev) => !prev);
+      } else {
+        setIsAdminOpen(false);
       }
     };
 
     window.addEventListener('hashchange', handleHash);
-    window.addEventListener('keydown', handleKeyDown);
     handleHash();
 
     return () => {
       window.removeEventListener('hashchange', handleHash);
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -65,19 +59,16 @@ function CafeApp() {
       {/* Tactile Noise Texture Overlay */}
       <NoiseCanvas />
 
-      {/* Interactive Contextual Follower Cursor */}
-      <CustomCursor />
-
       {/* Reservation Modal */}
       <ReservationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      {/* Admin Reservations & Dispatch Portal */}
+      {/* Admin Reservations & Dispatch Portal (accessible only via #admin hash) */}
       <AdminPortal
         isOpen={isAdminOpen}
         onClose={() => {
           setIsAdminOpen(false);
           if (window.location.hash === '#admin') {
-            window.history.replaceState(null, '', window.location.pathname);
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
           }
         }}
       />
@@ -90,7 +81,6 @@ function CafeApp() {
       {/* Main Navigation Header */}
       <Navbar
         onBookTableClick={() => setIsModalOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
       />
 
       {/* Page Content */}
