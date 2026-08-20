@@ -29,9 +29,6 @@ interface SubscriberRecord {
   createdAt: string;
 }
 
-
-
-// 30 Total Seats Layout Definition across 4 Distinct Café Zones
 export interface CafeTable {
   id: string;
   name: string;
@@ -67,6 +64,17 @@ export const CAFE_TABLES: CafeTable[] = [
   { id: 'A1', name: 'Atelier Library Table', zone: 'atelier', zoneLabel: 'Atelier Corner', seats: 4 },
 ];
 
+const TIME_SLOTS = [
+  '09:00 — Morning Calibration',
+  '10:15 — Single Origin Tasting',
+  '11:30 — Midday Pour Over',
+  '14:00 — Afternoon Extraction',
+  '15:30 — Rare Micro-Lot Service',
+  '17:00 — Evening Roast',
+  '18:30 — Twilight Extraction',
+  '20:00 — Night Service',
+];
+
 const parseGuestNum = (guestsStr?: string): number => {
   if (!guestsStr) return 2;
   const match = guestsStr.match(/(\d+)/);
@@ -78,10 +86,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
   const [reservations, setReservations] = useState<ReservationRecord[]>([]);
   const [subscribers, setSubscribers] = useState<SubscriberRecord[]>([]);
 
+  // Filtering & Sorting State
   const [filterDate, setFilterDate] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [subscriberSearch, setSubscriberSearch] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'guests' | 'status' | 'createdAt'>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(false);
   const [autoVacateEnabled, setAutoVacateEnabled] = useState(true);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
@@ -89,14 +100,43 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
   // Quick Walk-In Modal
   const [isWalkinOpen, setIsWalkinOpen] = useState(false);
   const [walkinName, setWalkinName] = useState('');
-  const [walkinGuests, setWalkinGuests] = useState('2');
+  const [walkinPhone, setWalkinPhone] = useState('+91 ');
+  const [walkinGuests, setWalkinGuests] = useState('2 Guests (Tasting Counter)');
   const [walkinTable, setWalkinTable] = useState('BAR-01');
   const [walkinDuration, setWalkinDuration] = useState('60');
+  const [walkinNotes, setWalkinNotes] = useState('');
+
+  // New Scheduled Reservation Modal
+  const [isNewBookingOpen, setIsNewBookingOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newGuests, setNewGuests] = useState('2 Guests (Tasting Counter)');
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [newTime, setNewTime] = useState(TIME_SLOTS[0]);
+  const [newNotes, setNewNotes] = useState('');
+  const [newTable, setNewTable] = useState('');
+  const [newStatus, setNewStatus] = useState<'confirmed' | 'seated'>('confirmed');
+
+  // Edit Reservation Modal
+  const [editingReservation, setEditingReservation] = useState<ReservationRecord | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editGuests, setEditGuests] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editTime, setEditTime] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editTable, setEditTable] = useState('');
+  const [editStatus, setEditStatus] = useState<'confirmed' | 'seated' | 'completed' | 'cancelled' | 'noshow'>('confirmed');
+  const [editDuration, setEditDuration] = useState('60');
 
   // Manual Seating Assign Modal
   const [assigningReservation, setAssigningReservation] = useState<ReservationRecord | null>(null);
   const [selectedTableForAssign, setSelectedTableForAssign] = useState<string>('BAR-01');
   const [assignDuration, setAssignDuration] = useState<string>('60');
+
+  // Subscriber Add Modal
+  const [isAddSubOpen, setIsAddSubOpen] = useState(false);
+  const [newSubEmail, setNewSubEmail] = useState('');
 
   // Current time ticker for live duration calculation
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
@@ -114,8 +154,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
     setTimeout(() => setActionNotice(null), 4000);
   };
 
-  const fetchRecords = useCallback(async () => {
-    setIsLoading(true);
+  const fetchRecords = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const [resRes, subRes] = await Promise.all([
         fetch('/api/reservations'),
@@ -133,14 +173,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
     } catch (err) {
       console.warn('Failed to load admin data:', err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, []);
 
+  // Fetch when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchRecords();
     }
+  }, [isOpen, fetchRecords]);
+
+  // Live polling: refresh data silently every 6 seconds while open
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = setInterval(() => {
+      fetchRecords(true);
+    }, 6000);
+    return () => clearInterval(interval);
   }, [isOpen, fetchRecords]);
 
   // Background Auto-Vacate sweep
@@ -153,7 +203,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         const data = await res.json();
         if (data.success && data.vacatedCount > 0) {
           notify(`Auto-vacated ${data.vacatedCount} expired session(s).`);
-          fetchRecords();
+          fetchRecords(true);
         }
       } catch (err) {
         console.warn('Auto-vacate sweep error:', err);
@@ -163,7 +213,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
     return () => clearInterval(interval);
   }, [isOpen, autoVacateEnabled, fetchRecords]);
 
-  // Map of currently seated reservations by table ID (supports T1, T-01, BAR-01, etc.)
+  // Map of currently seated reservations by table ID
   const tableOccupancyMap = useMemo(() => {
     const map = new Map<string, ReservationRecord>();
     reservations.forEach((r) => {
@@ -214,8 +264,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
   ) => {
     try {
       const payload: Record<string, unknown> = { status: newStatus };
-      if (tableNumber) payload.tableNumber = tableNumber;
-      if (durationMinutes) payload.durationMinutes = durationMinutes;
+      if (tableNumber !== undefined) payload.tableNumber = tableNumber;
+      if (durationMinutes !== undefined) payload.durationMinutes = durationMinutes;
+
+      // Optimistic update
+      setReservations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: newStatus, ...(tableNumber ? { tableNumber } : {}) } : r))
+      );
 
       const res = await fetch(`/api/reservations/${id}`, {
         method: 'PATCH',
@@ -230,14 +285,110 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         } else if (newStatus === 'seated') {
           notify(`Guest seated successfully at ${tableNumber || 'counter'}.`);
         } else if (newStatus === 'cancelled') {
-          notify('Reservation cancelled.');
+          notify('Reservation marked as cancelled.');
         } else if (newStatus === 'noshow') {
           notify('Reservation marked as No-Show.');
+        } else if (newStatus === 'confirmed') {
+          notify('Reservation reset to confirmed status.');
         }
-        await fetchRecords();
+        await fetchRecords(true);
+      } else {
+        notify(`Error: ${data.message || 'Failed to update status'}`);
+        await fetchRecords(true);
       }
     } catch (err) {
       console.warn('Update status error:', err);
+    }
+  };
+
+  // Open Edit Modal for a reservation
+  const handleOpenEdit = (r: ReservationRecord) => {
+    setEditingReservation(r);
+    setEditName(r.name);
+    setEditPhone(r.phone);
+    setEditGuests(r.guests);
+    setEditDate(r.date);
+    setEditTime(r.time);
+    setEditNotes(r.notes || '');
+    setEditTable(r.tableNumber || '');
+    setEditStatus(r.status);
+    setEditDuration(String(r.durationMinutes || 60));
+  };
+
+  // Submit Edit Form
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReservation) return;
+
+    if (!editName.trim()) {
+      alert('Please enter a valid guest name.');
+      return;
+    }
+
+    try {
+      const payload = {
+        name: editName.trim(),
+        phone: editPhone.trim(),
+        guests: editGuests.trim(),
+        date: editDate.trim(),
+        time: editTime.trim(),
+        notes: editNotes.trim() || undefined,
+        tableNumber: editTable.trim() || undefined,
+        durationMinutes: parseInt(editDuration, 10) || 60,
+        status: editStatus,
+      };
+
+      // Optimistic update
+      setReservations((prev) =>
+        prev.map((r) => (r.id === editingReservation.id ? { ...r, ...payload } : r))
+      );
+
+      const res = await fetch(`/api/reservations/${editingReservation.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        notify(`Updated details for "${editName.trim()}" successfully.`);
+        setEditingReservation(null);
+        await fetchRecords(true);
+      } else {
+        alert(data.message || 'Failed to update reservation details.');
+        await fetchRecords(true);
+      }
+    } catch (err) {
+      console.warn('Failed to save reservation edits:', err);
+      alert('Network error while updating reservation.');
+    }
+  };
+
+  // Delete Reservation Record
+  const handleDeleteReservation = async (id: string, name: string, code: string) => {
+    if (!window.confirm(`Are you sure you want to PERMANENTLY delete the reservation for "${name}" (${code})?`)) {
+      return;
+    }
+
+    try {
+      // Optimistic delete
+      setReservations((prev) => prev.filter((r) => r.id !== id));
+      if (editingReservation?.id === id) {
+        setEditingReservation(null);
+      }
+
+      const res = await fetch(`/api/reservations/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (data.success) {
+        notify(`Reservation for ${name} (${code}) deleted.`);
+        await fetchRecords(true);
+      } else {
+        notify(`Error: ${data.message || 'Failed to delete record'}`);
+        await fetchRecords(true);
+      }
+    } catch (err) {
+      console.warn('Delete reservation error:', err);
     }
   };
 
@@ -251,7 +402,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
       const data = await res.json();
       if (data.success) {
         notify(`Forcefully vacated ${guestName}. Seats released.`);
-        await fetchRecords();
+        await fetchRecords(true);
       }
     } catch (err) {
       console.warn('Force vacate error:', err);
@@ -272,7 +423,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
       const data = await res.json();
       if (data.success) {
         notify(data.message || 'All seated tables cleared and vacated.');
-        await fetchRecords();
+        await fetchRecords(true);
       }
     } catch (err) {
       console.warn('Force vacate all error:', err);
@@ -292,7 +443,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
       const data = await res.json();
       if (data.success) {
         notify(`Session for ${r.name} extended by +15m (Total: ${newDur} mins).`);
-        await fetchRecords();
+        await fetchRecords(true);
       }
     } catch (err) {
       console.warn('Extend error:', err);
@@ -311,11 +462,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: walkinName.trim(),
-          phone: '+91 00000 00000',
-          guests: `${walkinGuests} Guests (Walk-in Direct)`,
+          phone: walkinPhone.trim() || '+91 00000 00000',
+          guests: walkinGuests,
           date: todayStr,
-          time: 'Walk-in Current',
-          notes: `Walk-in seated at ${walkinTable}`,
+          time: 'Walk-in Direct Service',
+          notes: walkinNotes.trim() ? `[Walk-in] ${walkinNotes.trim()}` : `Walk-in seated at ${walkinTable}`,
           tableNumber: walkinTable,
           durationMinutes: parseInt(walkinDuration, 10) || 60,
           status: 'seated',
@@ -323,15 +474,60 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
       });
       const data = await res.json();
       if (data.success) {
-        notify(`Walk-in guest ${walkinName} seated at ${walkinTable}.`);
+        notify(`Walk-in guest "${walkinName}" seated at ${walkinTable}.`);
         setIsWalkinOpen(false);
         setWalkinName('');
-        await fetchRecords();
+        setWalkinNotes('');
+        await fetchRecords(true);
       } else {
         alert(data.message || 'Failed to seat walk-in.');
       }
     } catch (err) {
       console.warn('Walk-in error:', err);
+    }
+  };
+
+  // Create Advance Scheduled Booking
+  const handleCreateNewBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) {
+      alert('Please enter guest name.');
+      return;
+    }
+    if (!newPhone.trim()) {
+      alert('Please enter phone number.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newName.trim(),
+          phone: newPhone.trim(),
+          guests: newGuests,
+          date: newDate,
+          time: newTime,
+          notes: newNotes.trim() || undefined,
+          tableNumber: newTable.trim() || undefined,
+          status: newStatus,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        notify(`New booking confirmed for "${newName}" (${data.data?.code || 'CHC-NEW'}).`);
+        setIsNewBookingOpen(false);
+        setNewName('');
+        setNewPhone('');
+        setNewNotes('');
+        setNewTable('');
+        await fetchRecords(true);
+      } else {
+        alert(data.message || 'Failed to create reservation.');
+      }
+    } catch (err) {
+      console.warn('New booking error:', err);
     }
   };
 
@@ -345,6 +541,54 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
       parseInt(assignDuration, 10) || 60
     );
     setAssigningReservation(null);
+  };
+
+  // Add Subscriber
+  const handleAddSubscriber = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSubEmail.trim() || !newSubEmail.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newSubEmail.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        notify(`Subscribed "${newSubEmail.trim()}" to dispatch list.`);
+        setIsAddSubOpen(false);
+        setNewSubEmail('');
+        await fetchRecords(true);
+      } else {
+        alert(data.message || 'Failed to add subscriber.');
+      }
+    } catch (err) {
+      console.warn('Add subscriber error:', err);
+    }
+  };
+
+  // Delete Subscriber
+  const handleDeleteSubscriber = async (id: string, email: string) => {
+    if (!window.confirm(`Remove "${email}" from the dispatch subscriber list?`)) {
+      return;
+    }
+    try {
+      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      const res = await fetch(`/api/newsletter/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        notify(`Removed subscriber ${email}.`);
+        await fetchRecords(true);
+      } else {
+        notify(`Error: ${data.message || 'Failed to remove subscriber'}`);
+        await fetchRecords(true);
+      }
+    } catch (err) {
+      console.warn('Delete subscriber error:', err);
+    }
   };
 
   // Export Subscribers to CSV
@@ -369,18 +613,68 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
     document.body.removeChild(link);
   };
 
-  // Filtering for Reservations ledger
-  const filteredReservations = reservations.filter((r) => {
-    const matchesDate = filterDate ? r.date === filterDate : true;
-    const matchesStatus = filterStatus === 'ALL' ? true : r.status === filterStatus.toLowerCase();
-    const matchesSearch = searchQuery
-      ? r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.phone.includes(searchQuery) ||
-        r.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (r.tableNumber && r.tableNumber.toLowerCase().includes(searchQuery.toLowerCase()))
-      : true;
-    return matchesDate && matchesStatus && matchesSearch;
-  });
+  // Export Reservations to CSV
+  const handleExportReservationsCSV = () => {
+    if (reservations.length === 0) {
+      alert('No reservations to export.');
+      return;
+    }
+    const headers = ['Code', 'Guest Name', 'Phone', 'Guests', 'Date', 'Time', 'Table', 'Status', 'Duration (mins)', 'Notes', 'Created At'];
+    const rows = reservations.map((r) => [
+      r.code,
+      `"${r.name.replace(/"/g, '""')}"`,
+      `"${r.phone}"`,
+      `"${r.guests}"`,
+      r.date,
+      `"${r.time}"`,
+      `"${r.tableNumber || 'Unassigned'}"`,
+      r.status.toUpperCase(),
+      r.durationMinutes || 60,
+      `"${(r.notes || '').replace(/"/g, '""')}"`,
+      `"${new Date(r.createdAt).toLocaleString()}"`,
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `chc_reservations_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Sorting & Filtering for Reservations ledger
+  const filteredAndSortedReservations = useMemo(() => {
+    const filtered = reservations.filter((r) => {
+      const matchesDate = filterDate ? r.date === filterDate : true;
+      const matchesStatus = filterStatus === 'ALL' ? true : r.status === filterStatus.toLowerCase();
+      const matchesSearch = searchQuery
+        ? r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          r.phone.includes(searchQuery) ||
+          r.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (r.tableNumber && r.tableNumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (r.notes && r.notes.toLowerCase().includes(searchQuery.toLowerCase()))
+        : true;
+      return matchesDate && matchesStatus && matchesSearch;
+    });
+
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === 'date') {
+        comparison = a.date.localeCompare(b.date) || a.time.localeCompare(b.time);
+      } else if (sortBy === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === 'guests') {
+        comparison = parseGuestNum(a.guests) - parseGuestNum(b.guests);
+      } else if (sortBy === 'status') {
+        comparison = a.status.localeCompare(b.status);
+      } else if (sortBy === 'createdAt') {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [reservations, filterDate, filterStatus, searchQuery, sortBy, sortOrder]);
 
   const filteredSubscribers = subscribers.filter((s) =>
     subscriberSearch ? s.email.toLowerCase().includes(subscriberSearch.toLowerCase()) : true
@@ -396,6 +690,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
     const remainingMins = duration - elapsedMins;
     const isOverstay = remainingMins <= 0;
     return { elapsedMins, remainingMins, isOverstay, duration };
+  };
+
+  const toggleSort = (field: 'date' | 'name' | 'guests' | 'status' | 'createdAt') => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
   };
 
   if (!isOpen) return null;
@@ -415,10 +718,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
             <button
               type="button"
               className="btn-swiss btn-swiss-outline admin-header-btn font-mono"
-              onClick={fetchRecords}
-              title="Refresh database"
+              onClick={() => fetchRecords(false)}
+              title="Refresh database records"
             >
-              {isLoading ? 'SYNCING...' : 'REFRESH'}
+              {isLoading ? 'SYNCING...' : '🔄 REFRESH'}
             </button>
             <button
               type="button"
@@ -500,7 +803,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                 className="btn-swiss btn-walkin font-mono"
                 onClick={() => setIsWalkinOpen(true)}
               >
-                + QUICK WALK-IN
+                + WALK-IN
+              </button>
+              <button
+                type="button"
+                className="btn-swiss btn-new-booking font-mono"
+                onClick={() => setIsNewBookingOpen(true)}
+              >
+                + NEW BOOKING
               </button>
               <button
                 type="button"
@@ -508,7 +818,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                 onClick={handleForceVacateAll}
                 title="Immediately checkout and clear all currently seated parties"
               >
-                ⚡ FORCE VACATE ALL
+                ⚡ VACATE ALL
               </button>
             </div>
             <label className="auto-vacate-toggle font-mono meta-text" title="Automatically vacates guests once session duration expires">
@@ -615,6 +925,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                             )}
 
                             <div className="seat-actions-row">
+                              <button
+                                type="button"
+                                className="btn-table-action btn-edit-seat font-mono"
+                                onClick={() => handleOpenEdit(occupyingGuest)}
+                                title="Edit guest details & table"
+                              >
+                                EDIT
+                              </button>
                               <button
                                 type="button"
                                 className="btn-table-action btn-vacate font-mono"
@@ -728,11 +1046,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                             <div className="seat-actions-row">
                               <button
                                 type="button"
+                                className="btn-table-action btn-edit-seat font-mono"
+                                onClick={() => handleOpenEdit(occupyingGuest)}
+                                title="Edit guest details & table"
+                              >
+                                EDIT
+                              </button>
+                              <button
+                                type="button"
                                 className="btn-table-action btn-vacate font-mono"
                                 onClick={() => handleUpdateStatus(occupyingGuest.id, 'completed')}
                                 title="Checkout guest and release table"
                               >
-                                VACATE TABLE
+                                VACATE
                               </button>
                               <button
                                 type="button"
@@ -838,6 +1164,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                               )}
 
                               <div className="seat-actions-row">
+                                <button
+                                  type="button"
+                                  className="btn-table-action btn-edit-seat font-mono"
+                                  onClick={() => handleOpenEdit(occupyingGuest)}
+                                >
+                                  EDIT
+                                </button>
                                 <button
                                   type="button"
                                   className="btn-table-action btn-vacate font-mono"
@@ -947,10 +1280,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                               <div className="seat-actions-row">
                                 <button
                                   type="button"
+                                  className="btn-table-action btn-edit-seat font-mono"
+                                  onClick={() => handleOpenEdit(occupyingGuest)}
+                                >
+                                  EDIT
+                                </button>
+                                <button
+                                  type="button"
                                   className="btn-table-action btn-vacate font-mono"
                                   onClick={() => handleUpdateStatus(occupyingGuest.id, 'completed')}
                                 >
-                                  VACATE ATELIER
+                                  VACATE
                                 </button>
                                 <button
                                   type="button"
@@ -1017,10 +1357,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
               <div className="filter-group-left">
                 <input
                   type="text"
-                  placeholder="Search name, phone, code, table..."
+                  placeholder="Search name, phone, code, table, notes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="admin-filter-input font-sans"
+                  style={{ minWidth: '240px' }}
                 />
 
                 <div className="status-filter-pills font-mono">
@@ -1043,6 +1384,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                   value={filterDate}
                   onChange={(e) => setFilterDate(e.target.value)}
                   className="admin-filter-input font-sans"
+                  title="Filter by reservation date"
                 />
                 {filterDate && (
                   <button
@@ -1055,10 +1397,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                 )}
                 <button
                   type="button"
+                  className="btn-swiss btn-new-booking font-mono"
+                  onClick={() => setIsNewBookingOpen(true)}
+                >
+                  + NEW BOOKING
+                </button>
+                <button
+                  type="button"
                   className="btn-swiss btn-walkin font-mono"
                   onClick={() => setIsWalkinOpen(true)}
                 >
                   + WALK-IN
+                </button>
+                <button
+                  type="button"
+                  className="btn-swiss btn-swiss-outline font-mono"
+                  onClick={handleExportReservationsCSV}
+                  title="Download CSV export of reservations"
+                >
+                  ↓ CSV
                 </button>
               </div>
             </div>
@@ -1068,29 +1425,41 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
               <table className="admin-data-table font-sans">
                 <thead>
                   <tr className="meta-text font-mono">
-                    <th>CODE</th>
-                    <th>GUEST & CONTACT</th>
-                    <th>TABLE / SEATS</th>
-                    <th>SLOT & DATE</th>
-                    <th>STATUS & SESSION</th>
-                    <th>LIFECYCLE ACTIONS</th>
+                    <th onClick={() => toggleSort('createdAt')} style={{ cursor: 'pointer' }}>
+                      CODE {sortBy === 'createdAt' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => toggleSort('name')} style={{ cursor: 'pointer' }}>
+                      GUEST & CONTACT {sortBy === 'name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => toggleSort('guests')} style={{ cursor: 'pointer' }}>
+                      TABLE / SEATS {sortBy === 'guests' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => toggleSort('date')} style={{ cursor: 'pointer' }}>
+                      SLOT & DATE {sortBy === 'date' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => toggleSort('status')} style={{ cursor: 'pointer' }}>
+                      STATUS & SESSION {sortBy === 'status' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th>ACTIONS & EDIT</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredReservations.length === 0 ? (
+                  {filteredAndSortedReservations.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="empty-row font-mono meta-text">
                         No reservations found matching the current search or filters.
                       </td>
                     </tr>
                   ) : (
-                    filteredReservations.map((r) => {
+                    filteredAndSortedReservations.map((r) => {
                       const timer = r.status === 'seated' ? getSeatingTimer(r) : null;
 
                       return (
                         <tr key={r.id} className={`row-status-${r.status}`}>
                           {/* Code */}
-                          <td className="font-mono font-bold code-cell">{r.code}</td>
+                          <td className="font-mono font-bold code-cell">
+                            <span>{r.code}</span>
+                          </td>
 
                           {/* Guest Name & Notes */}
                           <td>
@@ -1141,9 +1510,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                             </div>
                           </td>
 
-                          {/* Actions */}
+                          {/* Actions & Edit */}
                           <td>
                             <div className="row-action-buttons font-mono">
+                              {/* Primary Edit Button for any row */}
+                              <button
+                                type="button"
+                                className="btn-action btn-action-edit"
+                                onClick={() => handleOpenEdit(r)}
+                                title="Edit guest details, table, or status"
+                              >
+                                EDIT ✎
+                              </button>
+
                               {r.status === 'confirmed' && (
                                 <>
                                   <button
@@ -1154,7 +1533,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                                       setSelectedTableForAssign('BAR-01');
                                     }}
                                   >
-                                    SEAT GUEST →
+                                    SEAT →
                                   </button>
                                   <button
                                     type="button"
@@ -1191,14 +1570,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                                   >
                                     +15m
                                   </button>
-                                  <button
-                                    type="button"
-                                    className="btn-action btn-action-force"
-                                    onClick={() => handleForceVacate(r.id, r.name)}
-                                    title="Force clear seats immediately"
-                                  >
-                                    ⚡ FORCE
-                                  </button>
                                 </>
                               )}
 
@@ -1211,9 +1582,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                                     setSelectedTableForAssign('BAR-01');
                                   }}
                                 >
-                                  RE-SEAT GUEST
+                                  RE-SEAT
                                 </button>
                               )}
+
+                              <button
+                                type="button"
+                                className="btn-action btn-action-delete"
+                                onClick={() => handleDeleteReservation(r.id, r.name, r.code)}
+                                title="Delete this reservation permanently"
+                              >
+                                ✕
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1242,16 +1622,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                   value={subscriberSearch}
                   onChange={(e) => setSubscriberSearch(e.target.value)}
                   className="admin-filter-input font-sans"
-                  style={{ width: '280px' }}
+                  style={{ width: '260px' }}
                 />
               </div>
-              <button
-                type="button"
-                className="btn-swiss btn-swiss-outline font-mono"
-                onClick={handleExportCSV}
-              >
-                ↓ EXPORT CSV
-              </button>
+              <div className="subscribers-right">
+                <button
+                  type="button"
+                  className="btn-swiss btn-walkin font-mono"
+                  onClick={() => setIsAddSubOpen(true)}
+                >
+                  + ADD SUBSCRIBER
+                </button>
+                <button
+                  type="button"
+                  className="btn-swiss btn-swiss-outline font-mono"
+                  onClick={handleExportCSV}
+                >
+                  ↓ EXPORT CSV
+                </button>
+              </div>
             </div>
 
             <div className="admin-table-scroll">
@@ -1261,12 +1650,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                     <th>#</th>
                     <th>SUBSCRIBER EMAIL</th>
                     <th>SUBSCRIPTION TIMESTAMP</th>
+                    <th>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSubscribers.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="empty-row font-mono meta-text">
+                      <td colSpan={4} className="empty-row font-mono meta-text">
                         No subscribers found.
                       </td>
                     </tr>
@@ -1276,11 +1666,370 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                         <td className="font-mono">{String(idx + 1).padStart(2, '0')}</td>
                         <td className="font-mono font-semibold">{sub.email}</td>
                         <td className="font-mono meta-text">{new Date(sub.createdAt).toLocaleString()}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn-action btn-action-delete font-mono"
+                            onClick={() => handleDeleteSubscriber(sub.id, sub.email)}
+                            title="Remove subscriber"
+                          >
+                            REMOVE ✕
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            MODAL: EDIT RESERVATION & GUEST DETAILS
+           ========================================================================= */}
+        {editingReservation && (
+          <div className="submodal-backdrop" onClick={() => setEditingReservation(null)}>
+            <div className="submodal-card edit-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="submodal-header">
+                <div>
+                  <span className="meta-text font-mono" style={{ color: 'var(--accent-terracotta)', fontSize: '0.6875rem' }}>
+                    BOOKING CODE: {editingReservation.code}
+                  </span>
+                  <h3 className="heading-title submodal-title">EDIT GUEST & RESERVATION DETAILS</h3>
+                </div>
+                <button
+                  type="button"
+                  className="chc-modal-close font-mono"
+                  onClick={() => setEditingReservation(null)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEdit} className="submodal-form">
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">GUEST FULL NAME *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="submodal-input font-sans"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">PHONE NUMBER *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      className="submodal-input font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">PARTY SIZE / GUEST TIER</label>
+                    <select
+                      value={editGuests}
+                      onChange={(e) => setEditGuests(e.target.value)}
+                      className="submodal-input font-sans"
+                    >
+                      <option value="1 Guest (Tasting Counter)">1 Guest (Tasting Counter)</option>
+                      <option value="2 Guests (Tasting Counter)">2 Guests (Tasting Counter)</option>
+                      <option value="2 Guests (Promenade Window)">2 Guests (Promenade Window)</option>
+                      <option value="3 Guests (Courtyard Lounge)">3 Guests (Courtyard Lounge)</option>
+                      <option value="4 Guests (Solarium Courtyard)">4 Guests (Solarium Courtyard)</option>
+                      <option value="4 Guests (Atelier Library Table)">4 Guests (Atelier Library Table)</option>
+                      <option value="6 Guests (Private Atelier Booking)">6 Guests (Private Atelier Booking)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">ASSIGNED TABLE / SEAT</label>
+                    <select
+                      value={editTable}
+                      onChange={(e) => setEditTable(e.target.value)}
+                      className="submodal-input font-mono"
+                    >
+                      <option value="">-- No Specific Table (Unassigned) --</option>
+                      {CAFE_TABLES.map((t) => {
+                        const isOccupiedByOther =
+                          tableOccupancyMap.has(t.id) &&
+                          tableOccupancyMap.get(t.id)?.id !== editingReservation.id;
+                        return (
+                          <option key={t.id} value={t.id}>
+                            {t.id} — {t.name} ({t.seats}s) {isOccupiedByOther ? '[OCCUPIED BY OTHER]' : '[VACANT]'}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">RESERVATION DATE</label>
+                    <input
+                      type="date"
+                      required
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      className="submodal-input font-sans"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">TIME SLOT</label>
+                    <select
+                      value={editTime}
+                      onChange={(e) => setEditTime(e.target.value)}
+                      className="submodal-input font-sans"
+                    >
+                      {TIME_SLOTS.map((slot) => (
+                        <option key={slot} value={slot}>
+                          {slot}
+                        </option>
+                      ))}
+                      {!TIME_SLOTS.includes(editTime) && editTime && (
+                        <option value={editTime}>{editTime}</option>
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">LIFECYCLE STATUS</label>
+                    <select
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value as ReservationRecord['status'])}
+                      className="submodal-input font-mono"
+                      style={{ fontWeight: 700 }}
+                    >
+                      <option value="confirmed">CONFIRMED (Awaiting Arrival)</option>
+                      <option value="seated">SEATED (Active Seating Session)</option>
+                      <option value="completed">COMPLETED (Vacated / Billed)</option>
+                      <option value="cancelled">CANCELLED</option>
+                      <option value="noshow">NO-SHOW</option>
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">SESSION DURATION (MINUTES)</label>
+                    <select
+                      value={editDuration}
+                      onChange={(e) => setEditDuration(e.target.value)}
+                      className="submodal-input font-sans"
+                    >
+                      <option value="30">30 Minutes (Express Espresso)</option>
+                      <option value="45">45 Minutes (Quick Brew)</option>
+                      <option value="60">60 Minutes (Standard Tasting)</option>
+                      <option value="90">90 Minutes (Courtyard Banquette)</option>
+                      <option value="120">120 Minutes (Extended Atelier)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="meta-text font-mono">SPECIAL REQUESTS / SOMMELIER NOTES</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Dietary requests, origin preferences, seating notes..."
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    className="submodal-input font-sans"
+                    style={{ resize: 'vertical' }}
+                  />
+                </div>
+
+                <div className="submodal-footer" style={{ justifyContent: 'space-between' }}>
+                  <button
+                    type="button"
+                    className="btn-swiss btn-delete-danger font-mono"
+                    onClick={() =>
+                      handleDeleteReservation(editingReservation.id, editingReservation.name, editingReservation.code)
+                    }
+                  >
+                    🗑 DELETE RECORD
+                  </button>
+
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button
+                      type="button"
+                      className="btn-swiss btn-swiss-outline font-mono"
+                      onClick={() => setEditingReservation(null)}
+                    >
+                      CANCEL
+                    </button>
+                    <button type="submit" className="btn-swiss btn-walkin font-mono">
+                      SAVE CHANGES ✓
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            MODAL: CREATE NEW ADVANCE BOOKING
+           ========================================================================= */}
+        {isNewBookingOpen && (
+          <div className="submodal-backdrop" onClick={() => setIsNewBookingOpen(false)}>
+            <div className="submodal-card edit-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="submodal-header">
+                <div>
+                  <span className="meta-text font-mono" style={{ color: 'var(--accent-terracotta)', fontSize: '0.6875rem' }}>
+                    ADMIN CREATE RESERVATION
+                  </span>
+                  <h3 className="heading-title submodal-title">SCHEDULE NEW RESERVATION</h3>
+                </div>
+                <button
+                  type="button"
+                  className="chc-modal-close font-mono"
+                  onClick={() => setIsNewBookingOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateNewBooking} className="submodal-form">
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">GUEST FULL NAME *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Vikram Seth"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="submodal-input font-sans"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">PHONE NUMBER *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="+91 98765 43210"
+                      value={newPhone}
+                      onChange={(e) => setNewPhone(e.target.value)}
+                      className="submodal-input font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">PARTY SIZE / EXPERIENCE</label>
+                    <select
+                      value={newGuests}
+                      onChange={(e) => setNewGuests(e.target.value)}
+                      className="submodal-input font-sans"
+                    >
+                      <option value="1 Guest (Tasting Counter)">1 Guest (Tasting Counter)</option>
+                      <option value="2 Guests (Tasting Counter)">2 Guests (Tasting Counter)</option>
+                      <option value="2 Guests (Promenade Window)">2 Guests (Promenade Window)</option>
+                      <option value="3 Guests (Courtyard Lounge)">3 Guests (Courtyard Lounge)</option>
+                      <option value="4 Guests (Solarium Courtyard)">4 Guests (Solarium Courtyard)</option>
+                      <option value="4 Guests (Atelier Library Table)">4 Guests (Atelier Library Table)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">TABLE ASSIGNMENT (OPTIONAL)</label>
+                    <select
+                      value={newTable}
+                      onChange={(e) => setNewTable(e.target.value)}
+                      className="submodal-input font-mono"
+                    >
+                      <option value="">Auto / Assign Upon Arrival</option>
+                      {CAFE_TABLES.map((t) => {
+                        const isOccupied = tableOccupancyMap.has(t.id);
+                        return (
+                          <option key={t.id} value={t.id}>
+                            {t.id} — {t.name} ({t.seats}s) {isOccupied ? '[OCCUPIED]' : '[VACANT]'}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">RESERVATION DATE</label>
+                    <input
+                      type="date"
+                      required
+                      value={newDate}
+                      onChange={(e) => setNewDate(e.target.value)}
+                      className="submodal-input font-sans"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">TIME SLOT</label>
+                    <select
+                      value={newTime}
+                      onChange={(e) => setNewTime(e.target.value)}
+                      className="submodal-input font-sans"
+                    >
+                      {TIME_SLOTS.map((slot) => (
+                        <option key={slot} value={slot}>
+                          {slot}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-field">
+                    <label className="meta-text font-mono">INITIAL STATUS</label>
+                    <select
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value as 'confirmed' | 'seated')}
+                      className="submodal-input font-mono"
+                    >
+                      <option value="confirmed">CONFIRMED (Awaiting Arrival)</option>
+                      <option value="seated">SEATED IMMEDIATELY</option>
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="meta-text font-mono">NOTES / SPECIAL REQUESTS</label>
+                    <input
+                      type="text"
+                      placeholder="Special occasion, single origin preference..."
+                      value={newNotes}
+                      onChange={(e) => setNewNotes(e.target.value)}
+                      className="submodal-input font-sans"
+                    />
+                  </div>
+                </div>
+
+                <div className="submodal-footer">
+                  <button
+                    type="button"
+                    className="btn-swiss btn-swiss-outline font-mono"
+                    onClick={() => setIsNewBookingOpen(false)}
+                  >
+                    CANCEL
+                  </button>
+                  <button type="submit" className="btn-swiss btn-walkin font-mono">
+                    CONFIRM & CREATE BOOKING →
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -1304,7 +2053,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
 
               <form onSubmit={handleCreateWalkin} className="submodal-form">
                 <div className="form-field">
-                  <label className="meta-text font-mono">GUEST / PARTY NAME</label>
+                  <label className="meta-text font-mono">GUEST / PARTY NAME *</label>
                   <input
                     type="text"
                     required
@@ -1316,6 +2065,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                   />
                 </div>
 
+                <div className="form-field">
+                  <label className="meta-text font-mono">CONTACT NUMBER (OPTIONAL)</label>
+                  <input
+                    type="text"
+                    placeholder="+91 98765 00000"
+                    value={walkinPhone}
+                    onChange={(e) => setWalkinPhone(e.target.value)}
+                    className="submodal-input font-mono"
+                  />
+                </div>
+
                 <div className="form-row-2">
                   <div className="form-field">
                     <label className="meta-text font-mono">PARTY SIZE</label>
@@ -1324,11 +2084,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                       onChange={(e) => setWalkinGuests(e.target.value)}
                       className="submodal-input font-sans"
                     >
-                      <option value="1">1 Guest</option>
-                      <option value="2">2 Guests</option>
-                      <option value="3">3 Guests</option>
-                      <option value="4">4 Guests</option>
-                      <option value="6">6 Guests</option>
+                      <option value="1 Guest (Walk-in Direct)">1 Guest</option>
+                      <option value="2 Guests (Walk-in Direct)">2 Guests</option>
+                      <option value="3 Guests (Walk-in Direct)">3 Guests</option>
+                      <option value="4 Guests (Walk-in Direct)">4 Guests</option>
+                      <option value="6 Guests (Walk-in Direct)">6 Guests</option>
                     </select>
                   </div>
 
@@ -1374,6 +2134,54 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
                   </button>
                   <button type="submit" className="btn-swiss btn-walkin font-mono">
                     SEAT GUEST NOW →
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            MODAL: ADD SUBSCRIBER
+           ========================================================================= */}
+        {isAddSubOpen && (
+          <div className="submodal-backdrop" onClick={() => setIsAddSubOpen(false)}>
+            <div className="submodal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="submodal-header">
+                <h3 className="heading-title submodal-title">ADD DISPATCH SUBSCRIBER</h3>
+                <button
+                  type="button"
+                  className="chc-modal-close font-mono"
+                  onClick={() => setIsAddSubOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleAddSubscriber} className="submodal-form">
+                <div className="form-field">
+                  <label className="meta-text font-mono">SUBSCRIBER EMAIL ADDRESS *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. reader@coffeeculture.in"
+                    value={newSubEmail}
+                    onChange={(e) => setNewSubEmail(e.target.value)}
+                    className="submodal-input font-sans"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="submodal-footer">
+                  <button
+                    type="button"
+                    className="btn-swiss btn-swiss-outline font-mono"
+                    onClick={() => setIsAddSubOpen(false)}
+                  >
+                    CANCEL
+                  </button>
+                  <button type="submit" className="btn-swiss btn-walkin font-mono">
+                    SAVE SUBSCRIBER →
                   </button>
                 </div>
               </form>
@@ -1558,7 +2366,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         /* Top Stats Strip */
         .admin-stats-strip {
           display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr 1.6fr;
+          grid-template-columns: 2fr 1fr 1fr 1fr 1.8fr;
           gap: 1rem;
           padding: 1.25rem 1.75rem;
           border-bottom: 1px solid var(--border-hairline);
@@ -1684,6 +2492,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           font-size: 0.75rem;
         }
 
+        .btn-new-booking {
+          background-color: var(--accent-terracotta);
+          color: #FFFFFF;
+          border-color: var(--accent-terracotta);
+          padding: 0.45rem 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        .btn-new-booking:hover {
+          background-color: #9c4826;
+        }
+
         .btn-force-all {
           background-color: #d32f2f;
           color: #FFFFFF;
@@ -1694,6 +2514,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
 
         .btn-force-all:hover {
           background-color: #b71c1c;
+        }
+
+        .btn-delete-danger {
+          background-color: #ffebee;
+          color: #c62828;
+          border: 1px solid #ffcdd2;
+          padding: 0.45rem 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        .btn-delete-danger:hover {
+          background-color: #d32f2f;
+          color: #FFFFFF;
         }
 
         .auto-vacate-toggle {
@@ -1829,15 +2662,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         }
 
         .grid-counter {
-          grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         }
 
         .grid-tables-2 {
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         }
 
         .grid-tables-4 {
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         }
 
         .table-seat-card {
@@ -1847,7 +2680,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          min-height: 135px;
+          min-height: 140px;
           transition: all 0.2s ease;
         }
 
@@ -1933,6 +2766,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           display: flex;
           gap: 0.35rem;
           margin-top: 0.25rem;
+          flex-wrap: wrap;
         }
 
         .btn-table-action {
@@ -1945,6 +2779,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           cursor: pointer;
           transition: all 0.2s ease;
           text-align: center;
+        }
+
+        .btn-table-action.btn-edit-seat {
+          background-color: var(--accent-terracotta);
+          color: #FFFFFF;
+          border-color: var(--accent-terracotta);
+          font-weight: 700;
         }
 
         .btn-table-action.btn-vacate {
@@ -1963,7 +2804,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
         }
 
         .btn-table-action.btn-force {
-          flex: 0 0 28px;
+          flex: 0 0 26px;
           background-color: #ffebee;
           color: #d32f2f;
           border-color: #ffcdd2;
@@ -2097,6 +2938,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           border-bottom: 1px solid var(--border-hairline);
           color: var(--text-muted);
           white-space: nowrap;
+          user-select: none;
         }
 
         .admin-data-table td {
@@ -2197,83 +3039,152 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           color: var(--text-primary);
           cursor: pointer;
           transition: all 0.2s ease;
+          white-space: nowrap;
         }
 
-        .btn-action-seat {
+        .btn-action:hover {
           background-color: var(--text-primary);
           color: var(--bg-canvas);
+        }
+
+        .btn-action-edit {
+          background-color: var(--accent-terracotta);
+          color: #FFFFFF;
+          border-color: var(--accent-terracotta);
           font-weight: 700;
         }
 
-        .btn-action-vacate {
+        .btn-action-edit:hover {
+          background-color: #9c4826;
+          color: #FFFFFF;
+        }
+
+        .btn-action-seat {
           background-color: #2e7d32;
           color: #FFFFFF;
           border-color: #2e7d32;
           font-weight: 700;
         }
 
-        .btn-action-vacate:hover {
+        .btn-action-seat:hover {
           background-color: #1b5e20;
-        }
-
-        .btn-action-force {
-          background-color: #ffebee;
-          color: #d32f2f;
-          border-color: #ffcdd2;
-        }
-
-        .btn-action-force:hover {
-          background-color: #d32f2f;
           color: #FFFFFF;
         }
 
+        .btn-action-vacate {
+          background-color: rgba(46, 125, 50, 0.1);
+          color: #2e7d32;
+          border-color: rgba(46, 125, 50, 0.3);
+          font-weight: 700;
+        }
+
+        .btn-action-vacate:hover {
+          background-color: #2e7d32;
+          color: #FFFFFF;
+        }
+
+        .btn-action-extend {
+          background-color: var(--bg-canvas-subtle);
+        }
+
+        .btn-action-noshow {
+          color: #c62828;
+        }
+
+        .btn-action-noshow:hover {
+          background-color: #c62828;
+          color: #FFFFFF;
+        }
+
+        .btn-action-cancel {
+          color: var(--text-muted);
+        }
+
+        .btn-action-reopen {
+          background-color: var(--bg-canvas-subtle);
+          color: var(--accent-coffee);
+        }
+
+        .btn-action-delete {
+          color: #c62828;
+          border-color: rgba(198, 40, 40, 0.3);
+          padding: 0.35rem 0.5rem;
+        }
+
+        .btn-action-delete:hover {
+          background-color: #c62828;
+          color: #FFFFFF;
+        }
+
+        .empty-row {
+          text-align: center;
+          padding: 3rem 1rem;
+          color: var(--text-muted);
+        }
+
+        /* Subscribers Toolbar */
         .subscribers-toolbar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 1rem;
-          flex-wrap: wrap;
+          margin-bottom: 1.25rem;
           gap: 1rem;
+          flex-wrap: wrap;
         }
 
         .subscribers-left {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1.25rem;
           flex-wrap: wrap;
         }
 
-        /* Submodals */
+        .subscribers-right {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        /* Submodal styles */
         .submodal-backdrop {
           position: fixed;
           inset: 0;
           z-index: calc(var(--z-modal) + 10);
-          background-color: rgba(0, 0, 0, 0.7);
+          background-color: rgba(0, 0, 0, 0.75);
+          backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 1rem;
+          padding: 1.5rem;
+          overflow-y: auto;
         }
 
         .submodal-card {
           background-color: var(--bg-canvas);
           border: 1px solid var(--border-hairline);
-          max-width: 480px;
           width: 100%;
-          padding: 1.5rem;
+          max-width: 580px;
+          padding: 1.75rem;
           box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+          position: relative;
+        }
+
+        .edit-modal-card {
+          max-width: 680px;
         }
 
         .submodal-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: 1.25rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--border-hairline);
         }
 
         .submodal-title {
-          font-size: 1.15rem;
-          margin: 0;
+          font-size: 1.2rem;
+          margin: 0.2rem 0 0;
         }
 
         .submodal-form {
@@ -2282,16 +3193,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           gap: 1rem;
         }
 
+        .form-row-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+          .form-row-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+
         .form-field {
           display: flex;
           flex-direction: column;
           gap: 0.35rem;
         }
 
-        .form-row-2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.75rem;
+        .form-field label {
+          font-size: 0.6875rem;
+          color: var(--text-muted);
+          letter-spacing: 0.05em;
         }
 
         .submodal-input {
@@ -2303,24 +3226,33 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
           outline: none;
         }
 
+        .submodal-input:focus {
+          border-color: var(--accent-terracotta);
+          background-color: var(--bg-canvas);
+        }
+
         .submodal-footer {
           display: flex;
           justify-content: flex-end;
           gap: 0.75rem;
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid var(--border-hairline);
         }
 
         .assign-guest-summary {
+          background-color: var(--bg-canvas-subtle);
+          border: 1px solid var(--border-hairline);
+          padding: 0.85rem 1rem;
           display: flex;
           flex-direction: column;
           gap: 0.35rem;
-          padding: 0.85rem;
-          background-color: var(--bg-canvas-subtle);
-          border: 1px solid var(--border-hairline);
         }
 
         .guest-notes-pill {
           color: var(--accent-coffee);
           font-size: 0.75rem;
+          font-style: italic;
         }
       `}</style>
     </div>

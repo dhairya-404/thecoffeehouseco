@@ -49,3 +49,28 @@ newsletterRouter.post('/', (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: 'Failed to subscribe', error });
   }
 });
+
+// DELETE /api/newsletter/:id - Remove subscriber (admin)
+newsletterRouter.delete('/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const db = readDb();
+    const target = db.subscribers.find((s) => s.id === id || s.email === id);
+
+    if (!target) {
+      return res.status(404).json({ success: false, message: 'Subscriber not found' });
+    }
+
+    db.subscribers = db.subscribers.filter((s) => s.id !== id && s.email !== id);
+    writeDb(db);
+
+    res.json({
+      success: true,
+      message: `Subscriber ${target.email} removed successfully.`,
+      id: target.id,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to remove subscriber', error });
+  }
+});
+

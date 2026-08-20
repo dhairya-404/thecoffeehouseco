@@ -256,11 +256,21 @@ reservationRouter.post('/force-vacate/:id', (req: Request, res: Response) => {
   }
 });
 
-// PATCH /api/reservations/:id - Update lifecycle status, table assignment, or details
-reservationRouter.patch('/:id', (req: Request, res: Response) => {
+// PATCH & PUT /api/reservations/:id - Update lifecycle status, table assignment, or guest details
+const updateReservationHandler = (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { status, tableNumber, durationMinutes, notes } = req.body;
+    const {
+      name,
+      phone,
+      guests,
+      date,
+      time,
+      notes,
+      status,
+      tableNumber,
+      durationMinutes,
+    } = req.body;
 
     const db = readDb();
     const index = db.reservations.findIndex((r) => r.id === id || r.code === id);
@@ -271,46 +281,86 @@ reservationRouter.patch('/:id', (req: Request, res: Response) => {
 
     const current = db.reservations[index];
 
-    if (status) {
+    // Update guest profile and booking details if supplied
+    if (name !== undefined && typeof name === 'string' && name.trim()) {
+      current.name = name.trim();
+    }
+    if (phone !== undefined && typeof phone === 'string' && phone.trim()) {
+      current.phone = phone.trim();
+    }
+    if (guests !== undefined && typeof guests === 'string' && guests.trim()) {
+      current.guests = guests.trim();
+    }
+    if (date !== undefined && typeof date === 'string' && date.trim()) {
+      current.date = date.trim();
+    }
+    if (time !== undefined && typeof time === 'string' && time.trim()) {
+      current.time = time.trim();
+    }
+    if (notes !== undefined) {
+      current.notes = typeof notes === 'string' ? notes.trim() : notes;
+    }
+    if (tableNumber !== undefined) {
+      current.tableNumber = typeof tableNumber === 'string' ? tableNumber.trim() || undefined : tableNumber;
+    }
+    if (durationMinutes !== undefined) {
+      current.durationMinutes = Number(durationMinutes) || 60;
+    }
+
+    // Lifecycle status transition management
+    if (status && status !== current.status) {
       current.status = status;
       if (status === 'seated') {
         if (!current.seatedAt) {
           current.seatedAt = new Date().toISOString();
         }
-        if (tableNumber) current.tableNumber = tableNumber;
-        if (durationMinutes) current.durationMinutes = Number(durationMinutes);
+        current.vacatedAt = undefined;
       } else if (status === 'completed') {
-        current.vacatedAt = new Date().toISOString();
+        if (!current.vacatedAt) {
+          current.vacatedAt = new Date().toISOString();
+        }
+      } else if (status === 'confirmed' || status === 'cancelled' || status === 'noshow') {
+        // If moved away from seated/completed
+        current.vacatedAt = undefined;
       }
     }
 
-    if (tableNumber !== undefined) current.tableNumber = tableNumber;
-    if (durationMinutes !== undefined) current.durationMinutes = Number(durationMinutes);
-    if (notes !== undefined) current.notes = notes;
-
     writeDb(db);
-    res.json({ success: true, data: current });
+    res.json({
+      success: true,
+      message: `Reservation for ${current.name} updated successfully.`,
+      data: current,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update reservation', error });
   }
-});
+};
+
+reservationRouter.patch('/:id', updateReservationHandler);
+reservationRouter.put('/:id', updateReservationHandler);
 
 // DELETE /api/reservations/:id - Delete record
 reservationRouter.delete('/:id', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const db = readDb();
-    const initialLen = db.reservations.length;
-    db.reservations = db.reservations.filter((r) => r.id !== id && r.code !== id);
+    const target = db.reservations.find((r) => r.id === id || r.code === id);
 
-    if (db.reservations.length === initialLen) {
+    if (!target) {
       return res.status(404).json({ success: false, message: 'Reservation not found' });
     }
 
+    db.reservations = db.reservations.filter((r) => r.id !== id && r.code !== id);
     writeDb(db);
-    res.json({ success: true, message: 'Reservation deleted successfully' });
+
+    res.json({
+      success: true,
+      message: `Reservation for ${target.name} (${target.code}) deleted successfully.`,
+      id: target.id,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete reservation', error });
   }
 });
+
 
