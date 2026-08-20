@@ -91,8 +91,8 @@
   --text-primary: #F5F3EE;
   --text-secondary: #D4CEC7;
   --text-muted: #8F8880;
-  --text-inverse: #111111;
-  --text-inverse-muted: #3D3834;
+  --text-inverse: #F5F3EE;
+  --text-inverse-muted: #D4CEC7;
 
   --accent-coffee: #D4A373;
   --accent-terracotta: #E27B55;
@@ -101,8 +101,8 @@
   --border-hairline: rgba(245, 243, 238, 0.12);
   --border-medium: rgba(245, 243, 238, 0.28);
   --border-strong: #F5F3EE;
-  --border-inverse-hairline: rgba(17, 17, 17, 0.2);
-  --border-inverse-strong: rgba(17, 17, 17, 0.6);
+  --border-inverse-hairline: rgba(245, 243, 238, 0.14);
+  --border-inverse-strong: rgba(245, 243, 238, 0.4);
 }
 
 [data-theme="dark"] .chc-navbar {
