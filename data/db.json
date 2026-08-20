@@ -9,11 +9,12 @@
       "date": "2026-08-20",
       "time": "17:00 — Evening Roast",
       "notes": "Single origin pour-over tasting exploration",
-      "status": "seated",
+      "status": "completed",
       "tableNumber": "BAR-01",
       "seatedAt": "2026-08-20T00:05:00.000Z",
       "durationMinutes": 60,
-      "createdAt": "2026-08-20T00:00:00.000Z"
+      "createdAt": "2026-08-20T00:00:00.000Z",
+      "vacatedAt": "2026-08-20T02:43:24.324Z"
     },
     {
       "id": "res-2",
@@ -23,11 +24,12 @@
       "guests": "2 Guests (Promenade Window)",
       "date": "2026-08-20",
       "time": "11:30 — Midday Pour Over",
-      "status": "seated",
+      "status": "completed",
       "tableNumber": "T-01",
       "seatedAt": "2026-08-20T00:15:00.000Z",
       "durationMinutes": 60,
-      "createdAt": "2026-08-20T00:10:00.000Z"
+      "createdAt": "2026-08-20T00:10:00.000Z",
+      "vacatedAt": "2026-08-20T02:43:24.324Z"
     },
     {
       "id": "res-3",
@@ -56,6 +58,54 @@
       "vacatedAt": "2026-08-20T00:00:00.000Z",
       "durationMinutes": 60,
       "createdAt": "2026-08-19T22:30:00.000Z"
+    },
+    {
+      "id": "res-1787193696297",
+      "code": "CHC-1108",
+      "name": "Dhairya D. Gajera",
+      "phone": "9876543210",
+      "guests": "2 Guests (Tasting Counter)",
+      "date": "2026-08-25",
+      "time": "17:00 — Evening Roast",
+      "notes": "Best service available",
+      "status": "completed",
+      "durationMinutes": 60,
+      "createdAt": "2026-08-20T02:41:36.297Z",
+      "tableNumber": "T1",
+      "seatedAt": "2026-08-20T02:44:29.411Z",
+      "vacatedAt": "2026-08-20T02:44:33.273Z"
+    },
+    {
+      "id": "res-1787193781280",
+      "code": "CHC-9599",
+      "name": "Dhairya D. Gajera",
+      "phone": "9876543210",
+      "guests": "6 Guests (Private Atelier)",
+      "date": "2026-08-25",
+      "time": "17:00 — Evening Roast",
+      "notes": "Best service",
+      "status": "completed",
+      "durationMinutes": 75,
+      "createdAt": "2026-08-20T02:43:01.280Z",
+      "tableNumber": "A1",
+      "seatedAt": "2026-08-20T02:43:43.402Z",
+      "vacatedAt": "2026-08-20T02:44:45.720Z"
+    },
+    {
+      "id": "res-1787193911419",
+      "code": "CHC-6737",
+      "name": "Shreyash Bhuva",
+      "phone": "+91 9879856525",
+      "guests": "2 Guests (Tasting Counter)",
+      "date": "2026-08-20",
+      "time": "Walk-in Direct Service",
+      "notes": "Walk-in seated at BAR-01",
+      "status": "completed",
+      "tableNumber": "BAR-01",
+      "seatedAt": "2026-08-20T02:45:11.419Z",
+      "durationMinutes": 90,
+      "createdAt": "2026-08-20T02:45:11.419Z",
+      "vacatedAt": "2026-08-20T02:45:28.729Z"
     }
   ],
   "subscribers": [
