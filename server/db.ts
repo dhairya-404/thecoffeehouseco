@@ -16,7 +16,11 @@ export interface Reservation {
   date: string;
   time: string;
   notes?: string;
-  status: 'confirmed' | 'seated' | 'cancelled';
+  status: 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'noshow';
+  tableNumber?: string;
+  seatedAt?: string;
+  vacatedAt?: string;
+  durationMinutes?: number;
   createdAt: string;
 }
 

@@ -107,7 +107,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onCl
   const slotOccupancy = useMemo(() => {
     if (!date || !time) return { booked: 0, remaining: MAX_CAPACITY, isFull: false };
     const active = allReservations.filter(
-      (r) => r.date === date && r.time === time && r.status !== 'cancelled'
+      (r) => r.date === date && r.time === time && (r.status === 'confirmed' || r.status === 'seated')
     );
     const booked = active.reduce((sum, r) => sum + parseGuestCount(r.guests), 0);
     const remaining = Math.max(0, MAX_CAPACITY - booked);

@@ -3,32 +3,50 @@ import { readDb, writeDb, Reservation } from '../db.js';
 
 export const reservationRouter = Router();
 
-// GET /api/reservations - Fetch all bookings
-reservationRouter.get('/', (_req: Request, res: Response) => {
-  try {
-    const db = readDb();
-    res.json({
-      success: true,
-      data: db.reservations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-      total: db.reservations.length,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch reservations', error });
-  }
-});
-
 const parseGuestCount = (guestsStr?: string): number => {
   if (!guestsStr) return 2;
   const match = guestsStr.match(/(\d+)/);
   return match ? parseInt(match[1], 10) : 2;
 };
 
+// GET /api/reservations - Fetch all bookings with live seating metrics
+reservationRouter.get('/', (_req: Request, res: Response) => {
+  try {
+    const db = readDb();
+    const sorted = [...db.reservations].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const currentlySeated = db.reservations.filter((r) => r.status === 'seated');
+    const liveOccupiedSeats = currentlySeated.reduce(
+      (sum, r) => sum + parseGuestCount(r.guests),
+      0
+    );
+
+    res.json({
+      success: true,
+      data: sorted,
+      total: db.reservations.length,
+      metrics: {
+        totalCapacity: 30,
+        liveOccupiedSeats,
+        liveAvailableSeats: Math.max(0, 30 - liveOccupiedSeats),
+        seatedPartiesCount: currentlySeated.length,
+        confirmedCount: db.reservations.filter((r) => r.status === 'confirmed').length,
+        completedCount: db.reservations.filter((r) => r.status === 'completed').length,
+        cancelledCount: db.reservations.filter((r) => r.status === 'cancelled').length,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch reservations', error });
+  }
+});
+
 // POST /api/reservations - Create a new booking with validation & 30-person capacity limit
 reservationRouter.post('/', (req: Request, res: Response) => {
   try {
-    const { name, phone, guests, date, time, notes } = req.body;
+    const { name, phone, guests, date, time, notes, tableNumber, status } = req.body;
 
-    // 1. Mandatory field checks
     if (!name || typeof name !== 'string' || !name.trim()) {
       return res.status(400).json({
         success: false,
@@ -51,7 +69,7 @@ reservationRouter.post('/', (req: Request, res: Response) => {
       });
     }
 
-    const cleanedPhone = phone.replace(/[\s\-\(\)]/g, '');
+    const cleanedPhone = phone.replace(/[\s\-()]/g, '');
     const digitsOnly = cleanedPhone.replace(/\D/g, '');
     if (digitsOnly.length < 10 || digitsOnly.length > 13) {
       return res.status(400).json({
@@ -67,11 +85,9 @@ reservationRouter.post('/', (req: Request, res: Response) => {
       });
     }
 
-    // Check if date is in the past
-    const selectedDate = new Date(date);
+    // Check if date is in past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    // Allow today's date
     const selectedDateMidnight = new Date(date + 'T00:00:00');
     if (selectedDateMidnight < today) {
       return res.status(400).json({
@@ -98,9 +114,9 @@ reservationRouter.post('/', (req: Request, res: Response) => {
     const db = readDb();
     const MAX_CAPACITY = 30;
 
-    // Check capacity for the requested date and time slot (30 guests maximum)
+    // Only active bookings (confirmed or seated) occupy capacity for that time slot
     const existingBookingsForSlot = db.reservations.filter(
-      (r) => r.date === date && r.time === time && r.status !== 'cancelled'
+      (r) => r.date === date && r.time === time && (r.status === 'confirmed' || r.status === 'seated')
     );
 
     const currentBookedSeats = existingBookingsForSlot.reduce(
@@ -114,14 +130,15 @@ reservationRouter.post('/', (req: Request, res: Response) => {
         success: false,
         message:
           remainingSeats > 0
-            ? `Seating capacity reached for this time slot. Only ${remainingSeats} seat(s) remaining (out of 30 max capacity). Your request is for ${guestCount} guests. Please select a smaller party or an alternate time slot.`
-            : `Capacity full for this time slot (30/30 seats booked). No further entries can be accepted. Please choose another seating time or date.`,
+            ? `Seating capacity reached for this time slot. Only ${remainingSeats} seat(s) remaining (out of 30 max capacity). Your request is for ${guestCount} guests.`
+            : `Capacity full for this time slot (30/30 seats booked). Please choose another seating time or date.`,
         remainingSeats,
         totalCapacity: MAX_CAPACITY,
       });
     }
 
     const randomCode = `CHC-${Math.floor(1000 + Math.random() * 9000)}`;
+    const isDirectSeated = status === 'seated';
     const newReservation: Reservation = {
       id: `res-${Date.now()}`,
       code: randomCode,
@@ -131,7 +148,10 @@ reservationRouter.post('/', (req: Request, res: Response) => {
       date,
       time,
       notes: notes?.trim() || undefined,
-      status: 'confirmed',
+      status: isDirectSeated ? 'seated' : 'confirmed',
+      tableNumber: tableNumber || undefined,
+      seatedAt: isDirectSeated ? new Date().toISOString() : undefined,
+      durationMinutes: 60,
       createdAt: new Date().toISOString(),
     };
 
@@ -140,7 +160,7 @@ reservationRouter.post('/', (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      message: 'Reservation confirmed successfully',
+      message: isDirectSeated ? 'Guest seated immediately' : 'Reservation confirmed successfully',
       data: newReservation,
     });
   } catch (error) {
@@ -148,10 +168,99 @@ reservationRouter.post('/', (req: Request, res: Response) => {
   }
 });
 
+// POST /api/reservations/vacate-expired - Auto-vacate sessions exceeding allocated duration
+reservationRouter.post('/vacate-expired', (_req: Request, res: Response) => {
+  try {
+    const db = readDb();
+    const now = new Date().getTime();
+    let vacatedCount = 0;
+    const vacatedIds: string[] = [];
+
+    db.reservations.forEach((r) => {
+      if (r.status === 'seated' && r.seatedAt) {
+        const seatedTime = new Date(r.seatedAt).getTime();
+        const durationLimitMs = (r.durationMinutes || 60) * 60 * 1000;
+        if (now - seatedTime >= durationLimitMs) {
+          r.status = 'completed';
+          r.vacatedAt = new Date().toISOString();
+          vacatedCount++;
+          vacatedIds.push(r.id);
+        }
+      }
+    });
+
+    if (vacatedCount > 0) {
+      writeDb(db);
+    }
+
+    res.json({
+      success: true,
+      message: `Auto-vacated ${vacatedCount} expired session(s).`,
+      vacatedCount,
+      vacatedIds,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to process auto-vacate', error });
+  }
+});
+
+// POST /api/reservations/force-vacate-all - Clear all currently seated guests immediately
+reservationRouter.post('/force-vacate-all', (_req: Request, res: Response) => {
+  try {
+    const db = readDb();
+    let vacatedCount = 0;
+    const nowIso = new Date().toISOString();
+
+    db.reservations.forEach((r) => {
+      if (r.status === 'seated') {
+        r.status = 'completed';
+        r.vacatedAt = nowIso;
+        vacatedCount++;
+      }
+    });
+
+    writeDb(db);
+
+    res.json({
+      success: true,
+      message: `Forcefully cleared and vacated ${vacatedCount} party/parties. All 30 seats are now available.`,
+      vacatedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to force vacate all', error });
+  }
+});
+
+// POST /api/reservations/force-vacate/:id - Force clear a single reservation
+reservationRouter.post('/force-vacate/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const db = readDb();
+    const index = db.reservations.findIndex((r) => r.id === id || r.code === id);
+
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: 'Reservation not found' });
+    }
+
+    db.reservations[index].status = 'completed';
+    db.reservations[index].vacatedAt = new Date().toISOString();
+    writeDb(db);
+
+    res.json({
+      success: true,
+      message: `Guest ${db.reservations[index].name} has been vacated and table released.`,
+      data: db.reservations[index],
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to force vacate reservation', error });
+  }
+});
+
+// PATCH /api/reservations/:id - Update lifecycle status, table assignment, or details
 reservationRouter.patch('/:id', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, tableNumber, durationMinutes, notes } = req.body;
 
     const db = readDb();
     const index = db.reservations.findIndex((r) => r.id === id || r.code === id);
@@ -160,18 +269,33 @@ reservationRouter.patch('/:id', (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: 'Reservation not found' });
     }
 
+    const current = db.reservations[index];
+
     if (status) {
-      db.reservations[index].status = status;
+      current.status = status;
+      if (status === 'seated') {
+        if (!current.seatedAt) {
+          current.seatedAt = new Date().toISOString();
+        }
+        if (tableNumber) current.tableNumber = tableNumber;
+        if (durationMinutes) current.durationMinutes = Number(durationMinutes);
+      } else if (status === 'completed') {
+        current.vacatedAt = new Date().toISOString();
+      }
     }
 
+    if (tableNumber !== undefined) current.tableNumber = tableNumber;
+    if (durationMinutes !== undefined) current.durationMinutes = Number(durationMinutes);
+    if (notes !== undefined) current.notes = notes;
+
     writeDb(db);
-    res.json({ success: true, data: db.reservations[index] });
+    res.json({ success: true, data: current });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update reservation', error });
   }
 });
 
-// DELETE /api/reservations/:id - Cancel booking
+// DELETE /api/reservations/:id - Delete record
 reservationRouter.delete('/:id', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -184,8 +308,9 @@ reservationRouter.delete('/:id', (req: Request, res: Response) => {
     }
 
     writeDb(db);
-    res.json({ success: true, message: 'Reservation cancelled successfully' });
+    res.json({ success: true, message: 'Reservation deleted successfully' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to cancel reservation', error });
+    res.status(500).json({ success: false, message: 'Failed to delete reservation', error });
   }
 });
+

@@ -5,34 +5,57 @@
       "code": "CHC-8492",
       "name": "Dhairya Patel",
       "phone": "+91 98765 43210",
-      "guests": "2 Guests (Tasting Counter)",
+      "guests": "1 Guest (Tasting Counter)",
       "date": "2026-08-20",
       "time": "17:00 — Evening Roast",
+      "notes": "Single origin pour-over tasting exploration",
       "status": "seated",
-      "createdAt": "2026-08-19T17:23:24.193Z"
+      "tableNumber": "BAR-01",
+      "seatedAt": "2026-08-20T00:05:00.000Z",
+      "durationMinutes": 60,
+      "createdAt": "2026-08-20T00:00:00.000Z"
     },
     {
       "id": "res-2",
       "code": "CHC-3108",
       "name": "Aanya Sharma",
       "phone": "+91 98123 45678",
-      "guests": "4 Guests (Courtyard Table)",
+      "guests": "2 Guests (Promenade Window)",
       "date": "2026-08-20",
       "time": "11:30 — Midday Pour Over",
       "status": "seated",
-      "createdAt": "2026-08-19T17:23:24.194Z"
+      "tableNumber": "T-01",
+      "seatedAt": "2026-08-20T00:15:00.000Z",
+      "durationMinutes": 60,
+      "createdAt": "2026-08-20T00:10:00.000Z"
     },
     {
-      "id": "res-1787160475534",
-      "code": "CHC-8365",
-      "name": "Dhairya Patel",
-      "phone": "+91 98765 43210",
+      "id": "res-3",
+      "code": "CHC-5521",
+      "name": "Vikram Seth",
+      "phone": "+91 97234 11223",
+      "guests": "4 Guests (Solarium Courtyard)",
+      "date": "2026-08-20",
+      "time": "18:30 — Twilight Extraction",
+      "notes": "Window preferred for anniversary celebration",
+      "status": "confirmed",
+      "durationMinutes": 90,
+      "createdAt": "2026-08-20T00:18:00.000Z"
+    },
+    {
+      "id": "res-4",
+      "code": "CHC-9902",
+      "name": "Mira Rajput",
+      "phone": "+91 98980 44556",
       "guests": "2 Guests (Tasting Counter)",
-      "date": "2026-03-11",
-      "time": "17:00 — Evening Roast",
-      "notes": "Quiet Corner for me and my better half a personal butler would be perfect for us (willing to pay extra if requested)",
-      "status": "seated",
-      "createdAt": "2026-08-19T17:27:55.534Z"
+      "date": "2026-08-20",
+      "time": "09:00 — Morning Calibration",
+      "status": "completed",
+      "tableNumber": "BAR-04",
+      "seatedAt": "2026-08-19T23:00:00.000Z",
+      "vacatedAt": "2026-08-20T00:00:00.000Z",
+      "durationMinutes": 60,
+      "createdAt": "2026-08-19T22:30:00.000Z"
     }
   ],
   "subscribers": [
@@ -42,8 +65,8 @@
       "createdAt": "2026-08-19T17:23:24.194Z"
     },
     {
-      "id": "sub-1787184407215",
-      "email": "dshsdh@gmail.com",
+      "id": "sub-2",
+      "email": "editorial@coffeeculture.in",
       "createdAt": "2026-08-20T00:06:47.222Z"
     }
   ],
