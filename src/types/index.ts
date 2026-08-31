@@ -1,41 +1,32 @@
-export type CursorVariant = 'default' | 'view' | 'open' | 'drag' | 'link' | 'hidden' | 'active' | string;
-
-export interface CursorState {
-  variant: CursorVariant;
-  text?: string;
-}
-
-export interface CoffeeFeature {
+// Types
+export type CoffeeFeature = {
   id: string;
   number: string;
   name: string;
   tagline: string;
+  description: string;
   origin: string;
   process: string;
   elevation: string;
   tastingNotes: string[];
-  description: string;
   image: string;
-  accentColor?: string;
-}
+};
 
-export interface MenuItem {
-  name: string;
-  price: string;
-  description: string;
-  image?: string;
-  tag?: string;
-  notes?: string;
-}
-
-export interface MenuCategory {
+export type MenuCategory = {
   id: string;
   title: string;
   description: string;
   items: MenuItem[];
-}
+};
 
-export interface RitualStep {
+export type MenuItem = {
+  name: string;
+  price: string;
+  description: string;
+  image: string;
+};
+
+export type RitualStep = {
   number: string;
   title: string;
   subTitle: string;
@@ -43,13 +34,25 @@ export interface RitualStep {
   description: string;
   detail: string;
   image: string;
-}
+};
 
-export interface GalleryItem {
-  id: string;
+export type GalleryItem = {
+  id: number;
   title: string;
-  time: string;
   location: string;
+  time: string;
+  aspect: 'landscape' | 'portrait' | 'square' | 'tall' | 'wide';
   image: string;
-  aspect: 'portrait' | 'landscape' | 'square' | 'tall';
-}
+};
+
+export type BrandInfo = {
+  name: string;
+  location: string;
+  phone: string;
+  email: string;
+  coordinates: string;
+  hours: {
+    weekdays: string;
+    weekends: string;
+  };
+};

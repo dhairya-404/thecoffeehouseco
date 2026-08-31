@@ -11,13 +11,11 @@ export const CoffeeSection: React.FC = () => {
   return (
     <section className="chc-craft-section dark-chapter" id="craft" aria-label="The Craft of Extraction">
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">03 / THE CRAFT</span>
           <span className="section-caption">SINGLE ESTATE MICRO-LOTS & EXTRACTION</span>
         </div>
 
-        {/* Grand Craft Statement */}
         <div className="swiss-grid craft-headline-grid">
           <div className="col-10 col-lg-8 col-sm-12">
             <h2 className="heading-hero craft-hero-title">
@@ -26,7 +24,6 @@ export const CoffeeSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Feature Navigation Tabs in Swiss Style */}
         <div className="craft-selector-bar">
           {COFFEE_FEATURES.map((item, idx) => (
             <button
@@ -43,9 +40,7 @@ export const CoffeeSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Interactive Feature Display Grid */}
         <div className="swiss-grid craft-detail-grid">
-          {/* Visual Column */}
           <div className="col-6 col-lg-8 col-sm-12">
             <div className="craft-image-frame">
               <img
@@ -61,7 +56,6 @@ export const CoffeeSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Editorial Specs Column */}
           <div className="col-6 col-lg-8 col-sm-12 craft-spec-col">
             <div className="craft-text-top">
               <span className="meta-text highlight-spec">ORIGIN SPECIFICATION</span>
@@ -70,7 +64,6 @@ export const CoffeeSection: React.FC = () => {
               <p className="body-text craft-body-p">{currentCoffee.description}</p>
             </div>
 
-            {/* Swiss Metadata Table */}
             <div className="craft-specs-table">
               <div className="spec-row">
                 <span className="meta-text spec-label">ESTATE / REGION</span>

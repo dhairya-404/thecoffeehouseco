@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 interface PreloaderProps {
@@ -6,98 +6,46 @@ interface PreloaderProps {
 }
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [count, setCount] = useState(0);
-  const curtainRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const preloaderRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 12) + 6;
-      if (progress >= 100) {
-        progress = 100;
-        setCount(100);
-        clearInterval(interval);
+    const tl = gsap.timeline({
+      onComplete: () => {
+        onComplete();
+      },
+    });
 
-        // Curtain Lift Animation
-        const tl = gsap.timeline({
-          onComplete: () => {
-            onComplete();
-          },
-        });
+    // Initial state
+    gsap.set(preloaderRef.current, { opacity: 1 });
 
-        tl.to(contentRef.current, {
-          y: -40,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power3.in',
-        });
-
-        tl.to(curtainRef.current, {
-          yPercent: -100,
-          duration: 1.1,
-          ease: 'power4.inOut',
-        });
-      } else {
-        setCount(progress);
-      }
-    }, 60);
-
-    return () => clearInterval(interval);
+    // Fade in preloader
+    tl.fromTo(
+      preloaderRef.current,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.5 }
+    )
+    // Animate text
+      .fromTo(
+        textRef.current,
+        { opacity: 0, y: 30, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'power3.out' }
+      )
+    // Fade out preloader
+      .to(preloaderRef.current, {
+        opacity: 0,
+        duration: 0.8,
+        delay: 1.5,
+        ease: 'power3.inOut',
+      });
   }, [onComplete]);
 
   return (
-    <div ref={curtainRef} className="preloader-curtain" aria-hidden="true">
-      <div ref={contentRef} className="preloader-content">
-        <div className="preloader-brand">THE COFFEE HOUSE CO.</div>
-        <div className="preloader-counter">{count.toString().padStart(2, '0')}%</div>
-        <div className="preloader-tagline">COFFEE / FOOD / CULTURE</div>
+    <div ref={preloaderRef} className="preloader" aria-hidden="true">
+      <div ref={textRef} className="preloader-content">
+        <span className="preloader-label meta-text">THE COFFEE HOUSE CO.</span>
+        <h1 className="preloader-title display-1">PREPARING</h1>
       </div>
-
-      <style>{`
-        .preloader-curtain {
-          position: fixed;
-          inset: 0;
-          width: 100vw;
-          height: 100vh;
-          background-color: #0A0807;
-          z-index: 1000000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          will-change: transform;
-        }
-
-        .preloader-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1.25rem;
-          text-align: center;
-        }
-
-        .preloader-brand {
-          font-family: var(--font-serif);
-          font-size: 1.1rem;
-          letter-spacing: 0.25em;
-          color: var(--accent-copper);
-        }
-
-        .preloader-counter {
-          font-family: var(--font-serif);
-          font-size: clamp(4rem, 10vw, 8rem);
-          color: var(--text-primary);
-          line-height: 1;
-          font-weight: 400;
-        }
-
-        .preloader-tagline {
-          font-size: var(--text-2xs);
-          letter-spacing: 0.3em;
-          color: var(--text-muted);
-          text-transform: uppercase;
-        }
-      `}</style>
     </div>
   );
 };

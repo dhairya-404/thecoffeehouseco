@@ -1,9 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useCursor } from '../context/CursorContext';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export const IntroStatement: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -51,13 +48,11 @@ export const IntroStatement: React.FC = () => {
   return (
     <section ref={sectionRef} className="chc-intro-section" id="intro" aria-label="About The House">
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">02 / THE HOUSE</span>
           <span className="section-caption">ARCHITECTURE × CRAFT × CULTURE</span>
         </div>
 
-        {/* Large Editorial Statement */}
         <div className="swiss-grid intro-statement-grid">
           <div className="col-10 col-lg-8 col-sm-12">
             <h2 ref={titleRef} className="heading-section intro-statement-text">
@@ -66,7 +61,6 @@ export const IntroStatement: React.FC = () => {
           </div>
         </div>
 
-        {/* Multi-Column Narrative & Architectural Pillars */}
         <div ref={textRef} className="swiss-grid intro-details-grid">
           <div className="col-4 col-lg-4 col-sm-12 intro-anim-block">
             <div className="intro-card-border">
@@ -99,16 +93,15 @@ export const IntroStatement: React.FC = () => {
           </div>
         </div>
 
-        {/* Editorial Pull Quote Banner */}
         <div
           className="intro-pullquote-banner"
           onMouseEnter={() => setCursor('link')}
           onMouseLeave={resetCursor}
         >
           <div className="pullquote-inner">
-            <span className="meta-text">FOUNDER’S MEMORANDUM</span>
+            <span className="meta-text">FOUNDER'S MEMORANDUM</span>
             <p className="font-display pullquote-statement">
-              “We do not offer quick coffee. We offer the quiet grace of paying complete attention.”
+              "We do not offer quick coffee. We offer the quiet grace of paying complete attention."
             </p>
             <div className="pullquote-signature meta-text">— THE COFFEE HOUSE CO. / AHMEDABAD</div>
           </div>

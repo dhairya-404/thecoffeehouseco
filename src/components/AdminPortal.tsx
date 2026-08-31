@@ -2494,14 +2494,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ isOpen, onClose }) => 
 
         .btn-new-booking {
           background-color: var(--accent-terracotta);
-          color: #FFFFFF;
+          color: #F5F1EA;
           border-color: var(--accent-terracotta);
           padding: 0.45rem 0.85rem;
           font-size: 0.75rem;
         }
 
         .btn-new-booking:hover {
-          background-color: #9c4826;
+          background-color: var(--accent-copper-hover);
         }
 
         .btn-force-all {

@@ -22,13 +22,11 @@ export const MenuSection: React.FC = () => {
       onMouseMove={handleMouseMove}
     >
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">04 / THE MENU</span>
           <span className="section-caption">SEASONAL EXTRACTIONS & ARTISANAL BAKEHOUSE</span>
         </div>
 
-        {/* Headline */}
         <div className="swiss-grid menu-title-grid">
           <div className="col-8 col-lg-8 col-sm-12">
             <h2 className="heading-section menu-main-heading">
@@ -42,7 +40,6 @@ export const MenuSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Selector Tabs */}
         <div className="menu-category-tabs" role="tablist">
           {MENU_CATEGORIES.map((cat, idx) => (
             <button
@@ -61,13 +58,11 @@ export const MenuSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Category Description Banner */}
         <div className="menu-category-banner">
           <span className="meta-text cat-summary-tag">CATEGORY NOTE:</span>
           <p className="cat-summary-text">{currentCategory.description}</p>
         </div>
 
-        {/* Typographic Editorial Menu List */}
         <div className="menu-editorial-list">
           {currentCategory.items.map((item, idx) => {
             const itemNum = (idx + 1).toString().padStart(2, '0');
@@ -84,7 +79,6 @@ export const MenuSection: React.FC = () => {
                   resetCursor();
                 }}
               >
-                {/* Mobile & Tablet Inline Thumbnail */}
                 {item.image && (
                   <div className="menu-item-thumb-wrap">
                     <img
@@ -115,14 +109,12 @@ export const MenuSection: React.FC = () => {
           })}
         </div>
 
-        {/* Dietary & Origin Note Footer */}
         <div className="menu-footer-meta">
           <span className="meta-text">OAT MILK SUBSTITUTION AVAILABLE (+₹40)</span>
           <span className="meta-text">PRICES INCLUSIVE OF ALL APPLICABLE TAXES</span>
         </div>
       </div>
 
-      {/* Floating Hover Image Preview (Desktop Pointer Only) */}
       {hoveredItemImage && (
         <div
           className="menu-floating-preview"
@@ -225,12 +217,11 @@ export const MenuSection: React.FC = () => {
         }
 
         .cat-summary-text {
-          font-size: var(--text-small);
+          font-size: var(--text-sm);
           color: var(--text-secondary);
           font-style: italic;
         }
 
-        /* Typographic Menu Rows */
         .menu-editorial-list {
           display: flex;
           flex-direction: column;
@@ -260,7 +251,6 @@ export const MenuSection: React.FC = () => {
           min-width: 0;
         }
 
-        /* Mobile & Tablet Thumbnail Image */
         .menu-item-thumb-wrap {
           display: none;
           width: 72px;
@@ -358,7 +348,6 @@ export const MenuSection: React.FC = () => {
           gap: 1rem;
         }
 
-        /* Floating Preview for Desktop */
         .menu-floating-preview {
           position: fixed;
           top: 0;

@@ -12,15 +12,12 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
   return (
     <section className="chc-location-section" id="location" aria-label="Location and Hours">
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">08 / FIND US</span>
           <span className="section-caption">RIVERFRONT CORNER • VISITS & RESERVATIONS</span>
         </div>
 
-        {/* Location Main Grid */}
         <div className="swiss-grid location-content-grid">
-          {/* Left Column: Big Typography & Hours */}
           <div className="col-6 col-lg-8 col-sm-12 location-details-col">
             <div className="location-heading-group">
               <span className="meta-text location-sub-badge">AHMEDABAD FLAGSHIP</span>
@@ -33,7 +30,6 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
               </p>
             </div>
 
-            {/* Operating Hours Table */}
             <div className="location-hours-table">
               <div className="hours-row">
                 <span className="meta-text hours-label">MONDAY — FRIDAY</span>
@@ -53,7 +49,6 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
               </div>
             </div>
 
-            {/* Directional Notes & Reserve Button */}
             <div className="location-actions-group">
               <button
                 type="button"
@@ -71,71 +66,64 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
             </div>
           </div>
 
-          {/* Right Column: Architectural Visual & Minimal Transit Grid Map */}
           <div className="col-6 col-lg-8 col-sm-12 location-visual-col">
-            {/* Minimal Vector Transit Map Graphic */}
             <div className="location-map-card">
               <div className="map-svg-wrap">
                 <svg viewBox="0 0 500 320" className="transit-map-svg" aria-label="Riverfront Transit Grid Map">
-                  {/* Grid Lines */}
                   <defs>
                     <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(17,17,17,0.06)" strokeWidth="1"/>
+                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(74,52,42,0.08)" strokeWidth="1"/>
                     </pattern>
                   </defs>
                   <rect width="100%" height="100%" fill="url(#grid-pattern)" />
 
-                  {/* Sabarmati River Curve */}
                   <path
                     d="M-20,260 C120,240 220,100 520,60"
                     fill="none"
-                    stroke="#D8D2C5"
+                    stroke="#D7C9B8"
                     strokeWidth="48"
                     strokeLinecap="round"
                   />
                   <path
                     d="M-20,260 C120,240 220,100 520,60"
                     fill="none"
-                    stroke="#B8B0A0"
+                    stroke="#B2967D"
                     strokeWidth="1.5"
                     strokeDasharray="4,4"
                   />
-                  <text x="70" y="245" fill="#8C847B" fontFamily="Space Mono" fontSize="9" letterSpacing="0.12em">
+                  <text x="70" y="245" fill="#7D5A44" fontFamily="Space Mono" fontSize="9" letterSpacing="0.12em">
                     SABARMATI RIVER
                   </text>
 
-                  {/* Riverfront Road */}
                   <path
                     d="M-10,220 C130,200 230,80 510,40"
                     fill="none"
-                    stroke="#111111"
+                    stroke="#4A342A"
                     strokeWidth="2.5"
                   />
-                  <text x="260" y="70" fill="#111111" fontFamily="Space Mono" fontSize="9" fontWeight="700" letterSpacing="0.1em">
+                  <text x="260" y="70" fill="#4A342A" fontFamily="Space Mono" fontSize="9" fontWeight="700" letterSpacing="0.1em">
                     RIVERFRONT ROAD WEST
                   </text>
 
-                  {/* Transit Landmarks */}
-                  <circle cx="150" cy="195" r="3" fill="#68625D" />
-                  <text x="160" y="198" fill="#68625D" fontFamily="Space Mono" fontSize="8">ELLIS BRIDGE</text>
+                  <circle cx="150" cy="195" r="3" fill="#7D5A44" />
+                  <text x="160" y="198" fill="#7D5A44" fontFamily="Space Mono" fontSize="8">ELLIS BRIDGE</text>
 
-                  <circle cx="390" cy="55" r="3" fill="#68625D" />
-                  <text x="400" y="58" fill="#68625D" fontFamily="Space Mono" fontSize="8">NEHRU BRIDGE</text>
+                  <circle cx="390" cy="55" r="3" fill="#7D5A44" />
+                  <text x="400" y="58" fill="#7D5A44" fontFamily="Space Mono" fontSize="8">NEHRU BRIDGE</text>
 
-                  {/* The Coffee House Co. Landmark Pin */}
                   <g transform="translate(300, 130)">
-                    <circle cx="0" cy="0" r="22" fill="rgba(184, 92, 56, 0.15)">
+                    <circle cx="0" cy="0" r="22" fill="rgba(125, 90, 68, 0.2)">
                       <animate attributeName="r" values="14;28;14" dur="2.5s" repeatCount="indefinite"/>
                       <animate attributeName="opacity" values="0.8;0.1;0.8" dur="2.5s" repeatCount="indefinite"/>
                     </circle>
-                    <circle cx="0" cy="0" r="7" fill="#B85C38"/>
-                    <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
+                    <circle cx="0" cy="0" r="7" fill="#7D5A44"/>
+                    <circle cx="0" cy="0" r="2.5" fill="#F5F1EA"/>
 
-                    <rect x="-80" y="-40" width="160" height="26" fill="#111111" />
-                    <text x="0" y="-23" fill="#F5F3EE" fontFamily="Space Mono" fontSize="8.5" fontWeight="700" letterSpacing="0.1em" textAnchor="middle">
+                    <rect x="-80" y="-40" width="160" height="26" fill="#4A342A" />
+                    <text x="0" y="-23" fill="#F5F1EA" fontFamily="Space Mono" fontSize="8.5" fontWeight="700" letterSpacing="0.1em" textAnchor="middle">
                       THE COFFEE HOUSE CO.
                     </text>
-                    <polygon points="-4,-14 4,-14 0,-9" fill="#111111"/>
+                    <polygon points="-4,-14 4,-14 0,-9" fill="#4A342A"/>
                   </g>
                 </svg>
               </div>
@@ -166,6 +154,12 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
           display: flex;
           flex-direction: column;
           gap: 2.5rem;
+        }
+
+        .location-heading-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
         }
 
         .location-sub-badge {
@@ -233,7 +227,6 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
           font-weight: 700;
         }
 
-        /* Map Visual Card */
         .location-map-card {
           background-color: var(--bg-canvas-subtle);
           border: 1px solid var(--border-hairline);
@@ -242,7 +235,7 @@ export const Location: React.FC<LocationProps> = ({ onReserveClick }) => {
 
         .map-svg-wrap {
           width: 100%;
-          background-color: #EFECE4;
+          background-color: var(--bg-canvas);
           border: 1px solid var(--border-hairline);
           overflow: hidden;
         }

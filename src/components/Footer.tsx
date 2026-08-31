@@ -42,7 +42,6 @@ export const Footer: React.FC = () => {
   return (
     <footer className="chc-footer-section" role="contentinfo" aria-label="Editorial Footer">
       <div className="container">
-        {/* Massive Headline Banner */}
         <div className="footer-top-banner">
           <span className="meta-text footer-top-tag">THE COFFEE HOUSE CO. // EDITION 2026</span>
           <h2 className="display-1 footer-massive-brand">
@@ -56,9 +55,7 @@ export const Footer: React.FC = () => {
 
         <hr className="swiss-rule footer-rule" />
 
-        {/* 4-Column Editorial Links & Info Grid */}
         <div className="swiss-grid footer-nav-grid">
-          {/* Col 1: Location */}
           <div className="col-3 col-lg-4 col-sm-12">
             <span className="meta-text footer-col-title">LOCATION</span>
             <p className="footer-col-text font-sans">
@@ -69,7 +66,6 @@ export const Footer: React.FC = () => {
             <span className="footer-coord font-mono">{BRAND_INFO.coordinates}</span>
           </div>
 
-          {/* Col 2: Operating Hours */}
           <div className="col-3 col-lg-4 col-sm-12">
             <span className="meta-text footer-col-title">HOURS</span>
             <div className="footer-hours-list font-sans">
@@ -84,7 +80,6 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Col 3: Navigation Index */}
           <div className="col-3 col-lg-4 col-sm-12">
             <span className="meta-text footer-col-title">INDEX</span>
             <nav className="footer-links-list font-sans" aria-label="Footer Index">
@@ -103,7 +98,6 @@ export const Footer: React.FC = () => {
             </nav>
           </div>
 
-          {/* Col 4: Correspondence & Dispatch Subscription */}
           <div className="col-3 col-lg-4 col-sm-12">
             <span className="meta-text footer-col-title">MONTHLY DISPATCH</span>
             <p className="footer-col-text font-sans">
@@ -140,11 +134,9 @@ export const Footer: React.FC = () => {
 
         <hr className="swiss-rule footer-rule" />
 
-        {/* Bottom Legal & Back to Top Bar */}
         <div className="footer-bottom-row">
           <div className="footer-copyright font-mono meta-text">
             © {new Date().getFullYear()} THE COFFEE HOUSE CO. ALL RIGHTS RESERVED.
-            <a href="#admin" className="footer-admin-link">STAFF CONSOLE ⚙</a>
           </div>
 
           <button
@@ -163,6 +155,7 @@ export const Footer: React.FC = () => {
       <style>{`
         .chc-footer-section {
           background-color: var(--bg-canvas-pure);
+          color: var(--text-primary);
           border-top: 1px solid var(--border-hairline);
           padding-top: clamp(5rem, 9vw, 8rem);
           padding-bottom: 3.5rem;
@@ -254,7 +247,7 @@ export const Footer: React.FC = () => {
         .dispatch-input-row {
           display: flex;
           border: 1px solid var(--border-hairline);
-          background-color: var(--bg-canvas);
+          background-color: var(--bg-canvas-pure);
         }
 
         .dispatch-input {
@@ -270,7 +263,7 @@ export const Footer: React.FC = () => {
         .dispatch-btn {
           padding: 0.65rem 1rem;
           background-color: var(--text-primary);
-          color: var(--bg-canvas);
+          color: var(--bg-canvas-pure);
           border: none;
           font-size: 0.75rem;
           font-weight: 600;
@@ -280,7 +273,7 @@ export const Footer: React.FC = () => {
 
         .dispatch-btn:hover {
           background-color: var(--accent-terracotta);
-          color: #FFFFFF;
+          color: #F5F1EA;
         }
 
         .dispatch-status {
@@ -337,7 +330,7 @@ export const Footer: React.FC = () => {
 
         .footer-back-to-top:hover {
           background-color: var(--text-primary);
-          color: var(--bg-canvas);
+          color: var(--bg-canvas-pure);
         }
       `}</style>
     </footer>

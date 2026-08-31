@@ -10,13 +10,11 @@ export const Atmosphere: React.FC = () => {
   return (
     <section className="chc-atmosphere-section" id="atmosphere" aria-label="Visual Archive of The Space">
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">06 / THE VISUAL ARCHIVE</span>
           <span className="section-caption">ATMOSPHERE • LIGHT • TACTILE DETAILS</span>
         </div>
 
-        {/* Headline */}
         <div className="swiss-grid atmosphere-title-grid">
           <div className="col-10 col-lg-8 col-sm-12">
             <h2 className="heading-section atmosphere-main-title">
@@ -25,7 +23,6 @@ export const Atmosphere: React.FC = () => {
           </div>
         </div>
 
-        {/* Curated Editorial Masonry Grid */}
         <div className="atmosphere-masonry-grid">
           {ATMOSPHERE_GALLERY.map((item, idx) => (
             <div
@@ -59,7 +56,6 @@ export const Atmosphere: React.FC = () => {
         </div>
       </div>
 
-      {/* Lightbox Zoom Modal */}
       {activeModalItem && (
         <div
           className="atmosphere-modal-backdrop"
@@ -165,7 +161,7 @@ export const Atmosphere: React.FC = () => {
           width: 100%;
           aspect-ratio: 4 / 3;
           overflow: hidden;
-          background-color: #E2DDD5;
+          background-color: var(--bg-canvas-subtle);
         }
 
         .card-tall .atmosphere-img-wrap {
@@ -194,13 +190,13 @@ export const Atmosphere: React.FC = () => {
         .atmosphere-hover-overlay {
           position: absolute;
           inset: 0;
-          background-color: rgba(17, 17, 17, 0.4);
+          background-color: rgba(74, 52, 42, 0.45);
           opacity: 0;
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 1.25rem;
-          color: var(--text-inverse);
+          color: var(--text-primary);
           transition: opacity var(--duration-fast) ease;
         }
 
@@ -242,11 +238,10 @@ export const Atmosphere: React.FC = () => {
           color: var(--text-primary);
         }
 
-        /* Modal Lightbox */
         .atmosphere-modal-backdrop {
           position: fixed;
           inset: 0;
-          background-color: rgba(17, 17, 17, 0.92);
+          background-color: rgba(43, 29, 22, 0.94);
           backdrop-filter: blur(10px);
           z-index: var(--z-modal);
           display: flex;
@@ -281,7 +276,7 @@ export const Atmosphere: React.FC = () => {
           max-height: 70vh;
           overflow: hidden;
           margin-bottom: 1.25rem;
-          background-color: #000;
+          background-color: var(--bg-canvas-dark);
         }
 
         .modal-zoom-image {

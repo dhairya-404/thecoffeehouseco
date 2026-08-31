@@ -7,13 +7,11 @@ export const StorySection: React.FC = () => {
   return (
     <section className="chc-story-section" id="story" aria-label="Our Story & Space">
       <div className="container">
-        {/* Section Header */}
         <div className="section-header">
           <span className="section-num">05 / THE SPACE & ORIGIN</span>
           <span className="section-caption">SABARMATI RIVERFRONT / AHMEDABAD</span>
         </div>
 
-        {/* Grand Story Headline */}
         <div className="swiss-grid story-headline-grid">
           <div className="col-12">
             <h2 className="display-1 story-big-title">
@@ -23,9 +21,7 @@ export const StorySection: React.FC = () => {
           </div>
         </div>
 
-        {/* Asymmetric Editorial Story Grid */}
         <div className="swiss-grid story-content-grid">
-          {/* Left Column: Architectural Photo with Editorial Framing */}
           <div className="col-6 col-lg-8 col-sm-12">
             <div
               className="story-image-block"
@@ -44,7 +40,6 @@ export const StorySection: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: Narrative Copy & Numbers */}
           <div className="col-6 col-lg-8 col-sm-12 story-narrative-block">
             <div className="story-paragraphs">
               <p className="body-lead story-lead-copy">
@@ -58,7 +53,6 @@ export const StorySection: React.FC = () => {
               </p>
             </div>
 
-            {/* Swiss Numbered Architectural Pillars */}
             <div className="story-metrics-grid">
               <div className="story-metric-item">
                 <span className="metric-digit font-display">30</span>

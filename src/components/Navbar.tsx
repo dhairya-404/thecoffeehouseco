@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useCursor } from '../context/CursorContext';
-import { useAudioAmbience } from '../hooks/useAudioAmbience';
 
 interface NavbarProps {
   onBookTableClick?: () => void;
@@ -18,7 +17,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
     return false;
   });
   const { setCursor, resetCursor } = useCursor();
-  const { isPlaying, toggleAudio } = useAudioAmbience();
 
   useEffect(() => {
     if (isDark) {
@@ -38,7 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle mobile menu scroll locking and escape key
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -57,9 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
     }
   }, [isMobileMenuOpen]);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
+  const toggleTheme = () => setIsDark(!isDark);
 
   const navLinks = [
     { label: 'MENU', href: '#menu', num: '01' },
@@ -78,12 +73,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
 
   return (
     <>
-      <header
-        className={`chc-navbar ${isScrolled ? 'is-scrolled' : ''}`}
-        role="banner"
-      >
+      <header className={`chc-navbar ${isScrolled ? 'is-scrolled' : ''}`} role="banner">
         <div className="container chc-nav-container">
-          {/* Left: Brand Monogram & Title */}
           <a
             href="#"
             className="chc-nav-brand"
@@ -94,7 +85,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
             <span className="brand-loc meta-text">AHMEDABAD / 23.02°N</span>
           </a>
 
-          {/* Center: Editorial Navigation Links */}
           <nav className="chc-nav-center" aria-label="Main Navigation">
             {navLinks.map((link) => (
               <a
@@ -113,9 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
             ))}
           </nav>
 
-          {/* Right: Dark Mode Toggle, Sound Ambience & Reserve Action */}
           <div className="chc-nav-right">
-            {/* Dark Mode Theme Button before Sound */}
             <button
               type="button"
               className="chc-theme-btn meta-text"
@@ -129,19 +117,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
               <span>{isDark ? 'LIGHT' : 'DARK'}</span>
             </button>
 
-            {/* Sound Ambience Toggle */}
-            <button
-              className={`chc-sound-btn meta-text ${isPlaying ? 'is-active' : ''}`}
-              onClick={toggleAudio}
-              title={isPlaying ? 'Pause Ambient Sound' : 'Play Ambient Room Sound'}
-              aria-label="Toggle ambient café audio"
-              onMouseEnter={() => setCursor('open', isPlaying ? 'MUTE' : 'AUDIO')}
-              onMouseLeave={resetCursor}
-            >
-              <span className={`sound-dot ${isPlaying ? 'pulsing' : ''}`}></span>
-              <span>{isPlaying ? 'SOUND: ON' : 'SOUND: OFF'}</span>
-            </button>
-
             <button
               type="button"
               className="btn-swiss chc-reserve-btn"
@@ -153,7 +128,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
               <span className="arrow-icon">→</span>
             </button>
 
-            {/* Mobile Burger Toggle */}
             <button
               className="chc-burger-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -167,11 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
         </div>
       </header>
 
-      {/* Fullscreen Mobile Editorial Drawer */}
-      <div
-        className={`chc-mobile-drawer ${isMobileMenuOpen ? 'is-open' : ''}`}
-        aria-hidden={!isMobileMenuOpen}
-      >
+      <div className={`chc-mobile-drawer ${isMobileMenuOpen ? 'is-open' : ''}`} aria-hidden={!isMobileMenuOpen}>
         <div className="container mobile-drawer-inner">
           <div className="mobile-drawer-header">
             <div className="mobile-drawer-header-top">
@@ -184,6 +154,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
                 className="mobile-drawer-close-btn font-mono"
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-label="Close navigation menu"
+                onMouseEnter={() => setCursor('open', 'CLOSE')}
+                onMouseLeave={resetCursor}
               >
                 ✕ CLOSE
               </button>
@@ -200,6 +172,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
                   e.preventDefault();
                   handleLinkClick(link.href);
                 }}
+                onMouseEnter={() => setCursor('link')}
+                onMouseLeave={resetCursor}
               >
                 <span className="mobile-num meta-text">{link.num}</span>
                 <span className="mobile-label font-display">{link.label}</span>
@@ -214,6 +188,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
               className="btn-swiss btn-swiss-outline full-width"
               onClick={toggleTheme}
               style={{ marginBottom: '0.75rem' }}
+              onMouseEnter={() => setCursor('open', isDark ? 'LIGHT' : 'DARK')}
+              onMouseLeave={resetCursor}
             >
               <span>THEME: {isDark ? 'LIGHT (WARM Ivory)' : 'DARK (ARCHITECTURAL)'}</span>
             </button>
@@ -224,6 +200,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
                 setIsMobileMenuOpen(false);
                 if (onBookTableClick) onBookTableClick();
               }}
+              onMouseEnter={() => setCursor('link')}
+              onMouseLeave={resetCursor}
             >
               RESERVE A TABLE →
             </button>
@@ -241,8 +219,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           top: 0;
           left: 0;
           width: 100%;
-          z-index: var(--z-nav);
-          background-color: rgba(245, 243, 238, 0.85);
+          z-index: var(--z-header);
+          background-color: rgba(245, 241, 234, 0.92);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid transparent;
@@ -251,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
         }
 
         .chc-navbar.is-scrolled {
-          background-color: rgba(245, 243, 238, 0.95);
+          background-color: rgba(245, 241, 234, 0.98);
           border-bottom-color: var(--border-hairline);
           padding: 0.85rem 0;
         }
@@ -349,58 +327,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           color: var(--accent-terracotta);
         }
 
-        .chc-sound-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 0.75rem;
-          border: 1px solid var(--border-hairline);
-          background-color: transparent;
-          color: var(--text-secondary);
-          transition: all var(--duration-fast) ease;
-        }
-
-        .chc-sound-btn:hover {
-          border-color: var(--text-primary);
-          color: var(--text-primary);
-        }
-
-        .sound-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background-color: var(--text-muted);
-          transition: background-color 0.2s ease;
-        }
-
-        .chc-sound-btn.is-active .sound-dot {
-          background-color: var(--accent-terracotta);
-          box-shadow: 0 0 8px var(--accent-terracotta);
-        }
-
-        .chc-sound-btn.is-active .sound-dot.pulsing {
-          animation: soundPulse 1.4s infinite ease-in-out;
-        }
-
-        @keyframes soundPulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.6); opacity: 0.6; }
-        }
-
         .chc-reserve-btn {
           padding: 0.65rem 1.25rem;
         }
 
         @media (max-width: 640px) {
-          .chc-sound-btn {
-            display: none;
-          }
           .chc-reserve-btn {
             display: none;
           }
         }
 
-        /* Burger Menu */
         .chc-burger-btn {
           display: none;
           flex-direction: column;
@@ -433,7 +369,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           transform: translateY(-3.25px) rotate(-45deg);
         }
 
-        /* Fullscreen Mobile Drawer */
         .chc-mobile-drawer {
           position: fixed;
           inset: 0;
@@ -559,13 +494,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onBookTableClick }) => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-
-        .staff-link-btn {
-          color: var(--accent-terracotta);
-          text-decoration: underline;
-          cursor: pointer;
-          font-size: 0.6875rem;
         }
       `}</style>
     </>

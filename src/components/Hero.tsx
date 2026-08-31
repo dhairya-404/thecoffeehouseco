@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { useCursor } from '../context/CursorContext';
 
@@ -49,7 +49,6 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
   return (
     <section ref={sectionRef} className="chc-hero-section" id="hero" aria-label="Hero Section">
       <div className="container">
-        {/* Section Numbering & Metadata Header */}
         <div ref={metaRef} className="section-header hero-top-meta">
           <span className="section-num">01 / THE COFFEE HOUSE CO.</span>
           <div className="hero-meta-items">
@@ -61,9 +60,7 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
           </div>
         </div>
 
-        {/* Asymmetrical Editorial Composition */}
         <div className="swiss-grid hero-main-grid">
-          {/* Left Column: Monumental Headline + Statement */}
           <div className="col-7 col-lg-8 col-sm-12 hero-text-column">
             <h1 ref={headlineRef} className="display-1 hero-headline">
               <span className="hero-line d-block">COFFEE</span>
@@ -102,7 +99,6 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
             </div>
           </div>
 
-          {/* Right Column: Architectural Signature Visual */}
           <div className="col-5 col-lg-8 col-sm-12 hero-visual-column">
             <div
               ref={imageFrameRef}
@@ -126,7 +122,6 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div ref={scrollIndicatorRef} className="hero-scroll-row">
           <a href="#intro" className="hero-scroll-link meta-text">
             <span>SCROLL TO DISCOVER</span>
@@ -235,7 +230,7 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
           width: 100%;
           aspect-ratio: 1 / 1;
           overflow: hidden;
-          background-color: #E6E2D8;
+          background-color: var(--bg-canvas-subtle);
         }
 
         .hero-primary-photo {
@@ -280,11 +275,6 @@ export const Hero: React.FC<HeroProps> = ({ onReserveClick }) => {
 
         .scroll-down-arrow {
           animation: floatArrow 2s infinite ease-in-out;
-        }
-
-        @keyframes floatArrow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(5px); }
         }
       `}</style>
     </section>

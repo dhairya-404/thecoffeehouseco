@@ -31,7 +31,7 @@ export const RitualSection: React.FC = () => {
         scrollTrigger: {
           trigger: sectionEl,
           pin: pinEl,
-          scrub: 0.2, // Ultra-responsive natural scrub with zero lag
+          scrub: 0.2,
           start: 'top top',
           end: () => `+=${Math.max(window.innerWidth * (isMobile ? 1.8 : 2.2), 1500)}`,
           anticipatePin: 1,
@@ -54,7 +54,6 @@ export const RitualSection: React.FC = () => {
       }
     }, sectionEl);
 
-    // Refresh ScrollTrigger to recalculate exact offsets after DOM paint
     const refreshTimer = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 150);
@@ -68,7 +67,6 @@ export const RitualSection: React.FC = () => {
   return (
     <section ref={sectionRef} id="ritual" className="chc-ritual-section" aria-label="The Coffee Brewing Ritual">
       <div ref={pinContainerRef} className="ritual-pin-wrapper">
-        {/* Sticky Header Bar */}
         <div className="container ritual-header-bar">
           <div className="section-header no-border">
             <span className="section-num">07 / THE EXTRACTION RITUAL</span>
@@ -76,9 +74,7 @@ export const RitualSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Horizontal Track of Sequential Ritual Steps */}
         <div ref={horizontalTrackRef} className="ritual-horizontal-track">
-          {/* Introductory Step Card */}
           <div className="ritual-card intro-step-card">
             <span className="meta-text step-tag">METHODOLOGY</span>
             <h3 className="display-1 ritual-intro-title">
@@ -90,7 +86,6 @@ export const RitualSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Sequential Step Cards */}
           {RITUAL_STEPS.map((step) => (
             <div
               key={step.number}
@@ -99,7 +94,6 @@ export const RitualSection: React.FC = () => {
               onMouseLeave={resetCursor}
             >
               <div className="step-card-inner">
-                {/* Step Top Bar */}
                 <div className="step-top-bar">
                   <span className="step-big-num font-mono">{step.number}</span>
                   <div className="step-timer-badge font-mono">
@@ -108,12 +102,10 @@ export const RitualSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Step Visual */}
                 <div className="step-photo-frame">
                   <img src={step.image} alt={step.title} className="step-img" loading="eager" />
                 </div>
 
-                {/* Step Content */}
                 <div className="step-bottom-info">
                   <span className="meta-text step-subtitle">{step.subTitle}</span>
                   <h4 className="heading-title step-heading">{step.title}</h4>
@@ -127,7 +119,6 @@ export const RitualSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Horizontal Progress Bar */}
         <div className="ritual-progress-container">
           <div ref={progressBarRef} className="ritual-progress-line"></div>
         </div>
@@ -249,7 +240,7 @@ export const RitualSection: React.FC = () => {
           width: 100%;
           flex-grow: 1;
           overflow: hidden;
-          background-color: #DDD8CE;
+          background-color: var(--bg-canvas-subtle);
         }
 
         .step-img {
